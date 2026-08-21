@@ -105,19 +105,28 @@ export function renderText(
   const parts = splitText(text);
   let delayOffset = 0;
   const markup: string[] = [];
+  let pendingWhitespace = "";
 
   for (const part of parts) {
     if (/^\s+$/.test(part)) {
-      markup.push(
-        `<span class="hw-space" aria-hidden="true" style="white-space: pre-wrap">${escapeHtml(part)}</span>`,
-      );
+      pendingWhitespace += part;
       continue;
     }
 
     const word = part;
     const { svg, letterCount } = renderWord(word, delayOffset, animate);
-    markup.push(svg);
+    const space = pendingWhitespace
+      ? `<span class="hw-space" aria-hidden="true" style="white-space: pre-wrap">${escapeHtml(pendingWhitespace)}</span>`
+      : "";
+    markup.push(`<span class="hw-token">${space}${svg}</span>`);
+    pendingWhitespace = "";
     delayOffset += letterCount;
+  }
+
+  if (pendingWhitespace) {
+    markup.push(
+      `<span class="hw-token"><span class="hw-space" aria-hidden="true" style="white-space: pre-wrap">${escapeHtml(pendingWhitespace)}</span></span>`,
+    );
   }
 
   return `<span class="hw-sentence" aria-label="${escapeAttr(text)}">${markup.join("")}</span>`;

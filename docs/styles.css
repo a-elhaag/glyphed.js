@@ -158,7 +158,7 @@ h2 {
   display: flex;
   flex-wrap: wrap;
   align-items: center;
-  gap: 0.1em 0.18em;
+  gap: 0;
 }
 .handwritten-heading .hw-word {
   display: block;

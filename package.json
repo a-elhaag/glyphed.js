@@ -1,0 +1,18 @@
+{
+  "name": "strokes-js",
+  "version": "0.1.0",
+  "description": "Renders text as animated hand-drawn SVG",
+  "type": "module",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "scripts": {
+    "build": "tsc",
+    "typecheck": "tsc --noEmit"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "devDependencies": {
+    "typescript": "^7.0.2"
+  }
+}

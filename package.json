@@ -33,7 +33,7 @@
     "text",
     "typography"
   ],
-  "author": "",
+  "author": "Anas <anaselhaag@gmail.com>",
   "license": "ISC",
   "devDependencies": {
     "typescript": "^7.0.2"

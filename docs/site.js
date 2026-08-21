@@ -2,7 +2,7 @@ import {
   attach,
   renderText,
   write,
-} from "https://cdn.jsdelivr.net/npm/strokes-js@0.1.2/+esm";
+} from "https://cdn.jsdelivr.net/npm/strokes-js@0.1.4/+esm";
 
 const reduceMotion = window.matchMedia(
   "(prefers-reduced-motion: reduce)",

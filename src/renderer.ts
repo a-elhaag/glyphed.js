@@ -56,27 +56,30 @@ function renderWord(
 
     const variantIndex = pickVariant(char, entry);
     const d = entry.variants[variantIndex];
+    const width = entry.variantWidths?.[variantIndex] ?? entry.width;
     const style = animate
       ? `stroke-dasharray:1;stroke-dashoffset:1;transition:stroke-dashoffset ${STROKE_MS}ms ease ${
           (delayOffset + letterIndex) * STAGGER_MS
         }ms;`
       : "";
 
-    const { rotate, dy, scale } = randomJitter();
-    const cx = entry.width / 2;
-    const cy = LETTER_HEIGHT / 2;
-    // Position first, then rotate/scale around the letter's own center (not the SVG origin)
-    // so the jitter can't nudge later letters in long words out of position.
-    const transform =
-      `translate(${x} ${dy.toFixed(2)}) translate(${cx} ${cy}) ` +
-      `rotate(${rotate.toFixed(1)}) scale(${scale.toFixed(3)}) translate(${-cx} ${-cy})`;
+    if (d) {
+      const { rotate, dy, scale } = randomJitter();
+      const cx = width / 2;
+      const cy = LETTER_HEIGHT / 2;
+      // Position first, then rotate/scale around the letter's own center (not the SVG origin)
+      // so the jitter can't nudge later letters in long words out of position.
+      const transform =
+        `translate(${x} ${dy.toFixed(2)}) translate(${cx} ${cy}) ` +
+        `rotate(${rotate.toFixed(1)}) scale(${scale.toFixed(3)}) translate(${-cx} ${-cy})`;
 
-    paths.push(
-      `<path d="${d}" transform="${transform}" stroke="var(--hw-color, #000)" fill="none" ` +
-        `stroke-width="2" stroke-linecap="round" pathLength="1" style="${style}" class="hw-letter" />`,
-    );
+      paths.push(
+        `<path d="${d}" transform="${transform}" stroke="var(--hw-color, #000)" fill="none" ` +
+          `stroke-width="2" stroke-linecap="round" pathLength="1" style="${style}" class="hw-letter" />`,
+      );
+    }
 
-    x += entry.width;
+    x += width;
     letterIndex++;
   }
 
@@ -85,6 +88,33 @@ function renderWord(
     `viewBox="0 0 ${x} ${LETTER_HEIGHT}" aria-hidden="true">${paths.join("")}</svg>`;
 
   return { svg, letterCount: letterIndex };
+}
+
+function renderWhitespace(
+  whitespace: string,
+  delayOffset: number,
+  animate: boolean,
+): { markup: string; letterCount: number } {
+  let letterCount = 0;
+  const markup: string[] = [];
+
+  for (const chunk of whitespace.split(/(\r\n|\r|\n)/)) {
+    if (!chunk) continue;
+    if (/^(\r\n|\r|\n)$/.test(chunk)) {
+      markup.push("<br />");
+      continue;
+    }
+
+    const { svg, letterCount: count } = renderWord(
+      chunk.replace(/\s/g, " "),
+      delayOffset + letterCount,
+      animate,
+    );
+    markup.push(svg);
+    letterCount += count;
+  }
+
+  return { markup: markup.join(""), letterCount };
 }
 
 export interface RenderTextOptions {
@@ -115,17 +145,26 @@ export function renderText(
 
     const word = part;
     const { svg, letterCount } = renderWord(word, delayOffset, animate);
-    const space = pendingWhitespace
-      ? `<span class="hw-space" aria-hidden="true" style="white-space: pre-wrap">${escapeHtml(pendingWhitespace)}</span>`
-      : "";
-    markup.push(`<span class="hw-token">${space}${svg}</span>`);
+    const { markup: space, letterCount: spaceCount } = renderWhitespace(
+      pendingWhitespace,
+      delayOffset,
+      animate,
+    );
+    markup.push(
+      `<span class="hw-token" style="display:inline-flex;align-items:baseline">${space}${svg}</span>`,
+    );
     pendingWhitespace = "";
-    delayOffset += letterCount;
+    delayOffset += spaceCount + letterCount;
   }
 
   if (pendingWhitespace) {
+    const { markup: space } = renderWhitespace(
+      pendingWhitespace,
+      delayOffset,
+      animate,
+    );
     markup.push(
-      `<span class="hw-token"><span class="hw-space" aria-hidden="true" style="white-space: pre-wrap">${escapeHtml(pendingWhitespace)}</span></span>`,
+      `<span class="hw-token" style="display:inline-flex;align-items:baseline">${space}</span>`,
     );
   }
 
@@ -136,13 +175,6 @@ function escapeAttr(value: string): string {
   return value
     .replace(/&/g, "&amp;")
     .replace(/"/g, "&quot;")
-    .replace(/</g, "&lt;")
-    .replace(/>/g, "&gt;");
-}
-
-function escapeHtml(value: string): string {
-  return value
-    .replace(/&/g, "&amp;")
     .replace(/</g, "&lt;")
     .replace(/>/g, "&gt;");
 }

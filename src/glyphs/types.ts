@@ -1,5 +1,6 @@
 export interface GlyphEntry {
   width: number;
+  variantWidths?: number[];
   variants: string[];
 }
 

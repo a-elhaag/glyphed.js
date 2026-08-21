@@ -1,0 +1,261 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta
+      name="description"
+      content="strokes.js renders text as animated, hand-drawn SVG."
+    />
+    <title>strokes.js | Handwritten SVG text</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Martian+Mono:wght@400;600&family=Spline+Sans:wght@400;500;600;700&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="./styles.css" />
+  </head>
+  <body>
+    <header class="site-header">
+      <a class="wordmark" href="./" aria-label="strokes.js home"></a>
+      <nav aria-label="Primary navigation">
+        <a href="#try-it">Try it</a>
+        <a href="./docs.html">Docs</a>
+        <a href="https://www.npmjs.com/package/strokes-js">npm</a>
+        <a href="https://github.com/a-elhaag/strokes.js/issues">Issues</a>
+      </nav>
+    </header>
+
+    <main>
+      <section class="hero" aria-labelledby="hero-heading">
+        <div class="hero-copy">
+          <p class="eyebrow">Animated SVG handwriting for the web</p>
+          <h1 class="handwritten-heading" id="hero-heading">
+            Give your interface a human hand.
+          </h1>
+          <p class="hero-summary">
+            A tiny, dependency-free package that draws real glyph paths, not a
+            font file.
+          </p>
+          <div class="hero-actions">
+            <a class="button button-primary" href="#try-it">Start drawing</a>
+            <a class="button button-quiet" href="./docs.html">Read the docs</a>
+            <a
+              class="button button-quiet"
+              href="https://github.com/a-elhaag/strokes.js"
+              >Star on GitHub</a
+            >
+          </div>
+        </div>
+        <div class="hero-canvas" aria-label="strokes.js handwritten logo">
+          <p class="canvas-label">strokes.js</p>
+          <div id="hero-writing"></div>
+          <div class="canvas-details">
+            <p>Animated SVG glyphs</p>
+            <p>Every render varies just enough.</p>
+          </div>
+        </div>
+      </section>
+
+      <section class="install-strip" aria-label="Installation commands">
+        <p>One package. Use your package manager.</p>
+        <div class="install-list">
+          <button
+            class="copy-command"
+            type="button"
+            data-copy="npm install strokes-js"
+          >
+            <code>npm install strokes-js</code><span>Copy</span>
+          </button>
+          <button
+            class="copy-command"
+            type="button"
+            data-copy="pnpm add strokes-js"
+          >
+            <code>pnpm add strokes-js</code><span>Copy</span>
+          </button>
+          <button
+            class="copy-command"
+            type="button"
+            data-copy="yarn add strokes-js"
+          >
+            <code>yarn add strokes-js</code><span>Copy</span>
+          </button>
+          <button
+            class="copy-command"
+            type="button"
+            data-copy="bun add strokes-js"
+          >
+            <code>bun add strokes-js</code><span>Copy</span>
+          </button>
+        </div>
+      </section>
+
+      <section
+        class="playground section-grid"
+        id="try-it"
+        aria-labelledby="try-title"
+      >
+        <div class="section-intro">
+          <p class="eyebrow">Live package test</p>
+          <h2 class="handwritten-heading" id="try-title">
+            Try it in your own words.
+          </h2>
+          <p>
+            This playground imports the version published to npm. Change the
+            ink, turn animation on or off, then redraw.
+          </p>
+        </div>
+
+        <div class="workbench">
+          <div class="control-row">
+            <label for="writing-input">Your text</label>
+            <textarea id="writing-input" rows="2" maxlength="120">
+Make something human.</textarea
+            >
+          </div>
+          <fieldset class="color-picker">
+            <legend>Ink color</legend>
+            <div class="swatches">
+              <button
+                class="swatch is-selected"
+                type="button"
+                data-color="#171b2e"
+                style="--swatch: #171b2e"
+                aria-label="Midnight ink"
+                title="Midnight ink"
+              ></button>
+              <button
+                class="swatch"
+                type="button"
+                data-color="#c63d24"
+                style="--swatch: #c63d24"
+                aria-label="Vermilion ink"
+                title="Vermilion ink"
+              ></button>
+              <button
+                class="swatch"
+                type="button"
+                data-color="#2458be"
+                style="--swatch: #2458be"
+                aria-label="Cobalt ink"
+                title="Cobalt ink"
+              ></button>
+              <button
+                class="swatch"
+                type="button"
+                data-color="#077d62"
+                style="--swatch: #077d62"
+                aria-label="Pine ink"
+                title="Pine ink"
+              ></button>
+            </div>
+          </fieldset>
+          <label class="toggle" for="animation-toggle">
+            <input id="animation-toggle" type="checkbox" checked />
+            <span>Animate the drawing</span>
+          </label>
+          <button class="button button-primary" id="redraw" type="button">
+            Draw it again
+          </button>
+        </div>
+
+        <div class="preview-stage" id="preview-stage" aria-live="polite">
+          <p class="stage-label">Your preview</p>
+          <div id="writing-preview"></div>
+        </div>
+      </section>
+
+      <section class="specimen-section" aria-labelledby="specimen-title">
+        <div class="section-heading">
+          <p class="eyebrow">A real glyph library</p>
+          <h2 class="handwritten-heading" id="specimen-title">
+            Letters with a little life in them.
+          </h2>
+        </div>
+        <div
+          class="specimen-grid"
+          id="specimens"
+          aria-label="Animated glyph specimens"
+        ></div>
+        <div class="variation-panel" aria-labelledby="variation-title">
+          <div>
+            <p class="eyebrow">Variable strokes</p>
+            <h3 id="variation-title">Same word. A different hand.</h3>
+            <p>
+              Each render varies glyph choice, scale, rotation, and baseline.
+            </p>
+          </div>
+          <div
+            class="variation-samples"
+            id="variation-samples"
+            aria-live="polite"
+          ></div>
+          <button
+            class="button button-quiet"
+            id="reroll-variations"
+            type="button"
+          >
+            Make new marks
+          </button>
+        </div>
+      </section>
+
+      <section class="how-it-works section-grid" aria-labelledby="works-title">
+        <div class="section-intro">
+          <p class="eyebrow">Small by design</p>
+          <h2 class="handwritten-heading" id="works-title">
+            Write once. Let the strokes do the work.
+          </h2>
+        </div>
+        <ol class="steps">
+          <li>
+            <strong>Render.</strong> Each character becomes an accessible SVG
+            path.
+          </li>
+          <li>
+            <strong>Vary.</strong> Glyph variants, rotation, scale, and baseline
+            drift keep it from feeling stamped.
+          </li>
+          <li>
+            <strong>Reveal.</strong> Use an observer or trigger the drawing
+            yourself.
+          </li>
+        </ol>
+      </section>
+
+      <section class="closing" aria-labelledby="closing-title">
+        <p class="eyebrow">Ready when you are</p>
+        <h2 class="handwritten-heading" id="closing-title">
+          Put a human mark on the web.
+        </h2>
+        <div class="hero-actions">
+          <a
+            class="button button-primary"
+            href="https://www.npmjs.com/package/strokes-js"
+            >Install from npm</a
+          >
+          <a
+            class="button button-quiet"
+            href="https://github.com/a-elhaag/strokes.js/issues"
+            >Report an issue</a
+          >
+          <a
+            class="button button-quiet"
+            href="https://github.com/a-elhaag/strokes.js"
+            >Star on GitHub</a
+          >
+        </div>
+      </section>
+    </main>
+
+    <footer>
+      <span>strokes.js</span>
+      <a href="./docs.html">Documentation</a>
+      <a href="https://github.com/a-elhaag/strokes.js">GitHub</a>
+    </footer>
+
+    <script type="module" src="./site.js"></script>
+  </body>
+</html>

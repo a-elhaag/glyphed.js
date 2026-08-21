@@ -197,6 +197,15 @@ export interface GlyphEntry {
 
 Adding or editing a glyph means editing its own file under `glyphs/letters`, `glyphs/digits`, or `glyphs/punctuation` — no other file needs to change except `glyphs.ts`'s import/lookup if you're adding a brand-new character.
 
+## Development
+
+```bash
+npm run build      # tsc — compiles src/ to dist/ (ESM + .d.ts)
+npm run typecheck  # tsc --noEmit
+```
+
+There is no test suite or lint script yet.
+
 ## Demo
 
 `demo/index.html` is a static page (loads `../dist/index.js`, so run `npm run build` first) with:

@@ -19,9 +19,8 @@ function pickVariant(char: string, entry: GlyphEntry): number {
   return index;
 }
 
-function splitWords(text: string): string[] {
-  // Attach trailing punctuation to the preceding word (e.g. "word," stays one unit).
-  return text.split(/\s+/).filter((w) => w.length > 0);
+function splitText(text: string): string[] {
+  return text.split(/(\s+)/).filter((part) => part.length > 0);
 }
 
 const JITTER_ROTATE_DEG = 7;
@@ -40,7 +39,7 @@ function randomJitter(): { rotate: number; dy: number; scale: number } {
 function renderWord(
   word: string,
   delayOffset: number,
-  animate: boolean
+  animate: boolean,
 ): { svg: string; letterCount: number } {
   let x = 0;
   const paths: string[] = [];
@@ -74,7 +73,7 @@ function renderWord(
 
     paths.push(
       `<path d="${d}" transform="${transform}" stroke="var(--hw-color, #000)" fill="none" ` +
-        `stroke-width="2" stroke-linecap="round" pathLength="1" style="${style}" class="hw-letter" />`
+        `stroke-width="2" stroke-linecap="round" pathLength="1" style="${style}" class="hw-letter" />`,
     );
 
     x += entry.width;
@@ -98,25 +97,43 @@ export interface RenderTextOptions {
  * When animate (default), each word's letters draw in via stroke-dashoffset once `.hw-visible`
  * is toggled on it — pass the result to observer.ts's `attach()` to trigger that on scroll.
  */
-export function renderText(text: string, options: RenderTextOptions = {}): string {
+export function renderText(
+  text: string,
+  options: RenderTextOptions = {},
+): string {
   const { animate = true } = options;
-  const words = splitWords(text);
+  const parts = splitText(text);
   let delayOffset = 0;
-  const wordSvgs: string[] = [];
+  const markup: string[] = [];
 
-  for (const word of words) {
+  for (const part of parts) {
+    if (/^\s+$/.test(part)) {
+      markup.push(
+        `<span class="hw-space" aria-hidden="true" style="white-space: pre-wrap">${escapeHtml(part)}</span>`,
+      );
+      continue;
+    }
+
+    const word = part;
     const { svg, letterCount } = renderWord(word, delayOffset, animate);
-    wordSvgs.push(svg);
+    markup.push(svg);
     delayOffset += letterCount;
   }
 
-  return `<span class="hw-sentence" aria-label="${escapeAttr(text)}">${wordSvgs.join(" ")}</span>`;
+  return `<span class="hw-sentence" aria-label="${escapeAttr(text)}">${markup.join("")}</span>`;
 }
 
 function escapeAttr(value: string): string {
   return value
     .replace(/&/g, "&amp;")
     .replace(/"/g, "&quot;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;");
+}
+
+function escapeHtml(value: string): string {
+  return value
+    .replace(/&/g, "&amp;")
     .replace(/</g, "&lt;")
     .replace(/>/g, "&gt;");
 }

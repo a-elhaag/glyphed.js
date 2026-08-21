@@ -91,11 +91,11 @@ el.style.setProperty("--hw-color", "#c0392b");
 
 One-call entry point: renders `text` into `target` and (unless `animate: false`) wires up the scroll-triggered draw-in animation.
 
-| Param | Type | Description |
-|---|---|---|
-| `target` | `HTMLElement \| string` | Element to render into, or a CSS selector. No-ops silently if the selector matches nothing. |
-| `text` | `string` | Text to render. |
-| `options` | `WriteOptions` | See below. |
+| Param     | Type                    | Description                                                                                 |
+| --------- | ----------------------- | ------------------------------------------------------------------------------------------- |
+| `target`  | `HTMLElement \| string` | Element to render into, or a CSS selector. No-ops silently if the selector matches nothing. |
+| `text`    | `string`                | Text to render.                                                                             |
+| `options` | `WriteOptions`          | See below.                                                                                  |
 
 `WriteOptions` = `RenderTextOptions & AttachOptions` (all fields optional, documented below).
 
@@ -105,9 +105,9 @@ Returns an HTML string: a `<span class="hw-sentence">` wrapping one `<svg class=
 
 **`RenderTextOptions`**
 
-| Option | Type | Default | Description |
-|---|---|---|---|
-| `animate` | `boolean` | `true` | When `true`, each letter's path is rendered with `stroke-dasharray/dashoffset` primed for the draw-in transition (invisible until `animateWriting()` runs on it). When `false`, letters render fully drawn immediately, with no transition styling. |
+| Option    | Type      | Default | Description                                                                                                                                                                                                                                         |
+| --------- | --------- | ------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `animate` | `boolean` | `true`  | When `true`, each letter's path is rendered with `stroke-dasharray/dashoffset` primed for the draw-in transition (invisible until `animateWriting()` runs on it). When `false`, letters render fully drawn immediately, with no transition styling. |
 
 ### `attach(el, options?)`
 
@@ -115,12 +115,12 @@ Wires an `IntersectionObserver` to `el` so that when it scrolls into view, every
 
 **`AttachOptions`** (a subset of standard `IntersectionObserverInit`, plus `once`)
 
-| Option | Type | Default | Description |
-|---|---|---|---|
-| `root` | `Element \| null` | `null` (viewport) | Passed through to `IntersectionObserver`. |
-| `rootMargin` | `string` | `"0px"` | Passed through to `IntersectionObserver`. |
-| `threshold` | `number \| number[]` | `0` | Passed through to `IntersectionObserver`. |
-| `once` | `boolean` | `true` | If `true`, stops observing `el` after the first time it intersects (animation fires once). Set `false` to re-trigger every time it re-enters the viewport (combine with re-rendering if you want fresh variants each time). |
+| Option       | Type                 | Default           | Description                                                                                                                                                                                                                 |
+| ------------ | -------------------- | ----------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `root`       | `Element \| null`    | `null` (viewport) | Passed through to `IntersectionObserver`.                                                                                                                                                                                   |
+| `rootMargin` | `string`             | `"0px"`           | Passed through to `IntersectionObserver`.                                                                                                                                                                                   |
+| `threshold`  | `number \| number[]` | `0`               | Passed through to `IntersectionObserver`.                                                                                                                                                                                   |
+| `once`       | `boolean`            | `true`            | If `true`, stops observing `el` after the first time it intersects (animation fires once). Set `false` to re-trigger every time it re-enters the viewport (combine with re-rendering if you want fresh variants each time). |
 
 ### `animateWriting(el)`
 
@@ -141,12 +141,12 @@ Both layers use `Math.random()` directly and are **not deterministic** — re-re
 
 ## Styling & class names
 
-| Class | Applied to | Purpose |
-|---|---|---|
-| `hw-sentence` | outer `<span>` | Wraps all words for one `renderText()` call; carries `aria-label` with the original text. |
-| `hw-word` | one `<svg>` per word | The unit `attach()`/`animateWriting()` operate on. |
-| `hw-letter` | one `<path>` per letter | Individual glyph stroke. |
-| `hw-visible` | added to `hw-word` elements | Set by `animateWriting()` once triggered; useful as a CSS hook if you want to react to "this word has started drawing." |
+| Class         | Applied to                  | Purpose                                                                                                                 |
+| ------------- | --------------------------- | ----------------------------------------------------------------------------------------------------------------------- |
+| `hw-sentence` | outer `<span>`              | Wraps all words for one `renderText()` call; carries `aria-label` with the original text.                               |
+| `hw-word`     | one `<svg>` per word        | The unit `attach()`/`animateWriting()` operate on.                                                                      |
+| `hw-letter`   | one `<path>` per letter     | Individual glyph stroke.                                                                                                |
+| `hw-visible`  | added to `hw-word` elements | Set by `animateWriting()` once triggered; useful as a CSS hook if you want to react to "this word has started drawing." |
 
 Color is the one themeable value, via the `--hw-color` custom property (see [Styling color](#styling-color)). Stroke width (`2`) and letter height (`24` units, viewBox-relative) are currently fixed, not configurable.
 
@@ -157,14 +157,14 @@ Color is the one themeable value, via the `--hw-color` custom property (see [Sty
 
 ## Glyph coverage
 
-| Set | Characters |
-|---|---|
-| Lowercase | `a`–`z` |
-| Uppercase | `A`–`Z` |
-| Digits | `0`–`9` |
+| Set         | Characters              |
+| ----------- | ----------------------- |
+| Lowercase   | `a`–`z`                 |
+| Uppercase   | `A`–`Z`                 |
+| Digits      | `0`–`9`                 |
 | Punctuation | `.` `,` `!` `?` `'` `-` |
 
-Characters outside this set (other punctuation, whitespace beyond the plain space used to split words, non-Latin scripts, emoji) are silently skipped — they contribute no path and no width. Unsupported *uppercase* input falls back to the lowercase glyph if one exists (e.g. an accidental extra capital); punctuation is matched exactly, with no case folding.
+Characters outside this set (other punctuation, whitespace beyond the plain space used to split words, non-Latin scripts, emoji) are silently skipped — they contribute no path and no width. Unsupported _uppercase_ input falls back to the lowercase glyph if one exists (e.g. an accidental extra capital); punctuation is matched exactly, with no case folding.
 
 ## Project structure
 
@@ -190,8 +190,8 @@ Each glyph file exports a single `GlyphEntry`:
 
 ```ts
 export interface GlyphEntry {
-  width: number;      // advance width, in the same units as the 24-unit-tall viewBox
-  variants: string[];  // one or more monoline SVG path `d` strings, hand-drawn within 0 0 width 24
+  width: number; // advance width, in the same units as the 24-unit-tall viewBox
+  variants: string[]; // one or more monoline SVG path `d` strings, hand-drawn within 0 0 width 24
 }
 ```
 
@@ -200,6 +200,7 @@ Adding or editing a glyph means editing its own file under `glyphs/letters`, `gl
 ## Demo
 
 `demo/index.html` is a static page (loads `../dist/index.js`, so run `npm run build` first) with:
+
 - a live playground — type any text, change stroke color, toggle animate on/off, replay
 - the full glyph gallery — every supported letter, digit, and punctuation mark, animated on scroll
 

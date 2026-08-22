@@ -3,7 +3,7 @@
 Renders text as animated hand-drawn SVG. Each letter is a real monoline glyph path (not a font), drawn in with a stroke animation as its word scrolls into view — with per-letter randomness (rotation, baseline drift, scale, and multiple hand-drawn variants per character) so the same word never renders identically twice.
 
 - Zero dependencies, ESM, TypeScript strict, ~small
-- Full a–z, A–Z, 0–9, and punctuation (`. , ! ? ' -`) coverage
+- Full a–z, A–Z, 0–9, and punctuation (`. , ! ? ' - & ( ) — " \` { } [ ] * = + @ :`) coverage
 - Scroll-triggered draw-in animation via `IntersectionObserver`, or static fully-drawn output
 - Styleable with one CSS custom property (`--hw-color`)
 
@@ -162,7 +162,7 @@ Color is the one themeable value, via the `--hw-color` custom property (see [Sty
 | Lowercase   | `a`–`z`                 |
 | Uppercase   | `A`–`Z`                 |
 | Digits      | `0`–`9`                 |
-| Punctuation | `.` `,` `!` `?` `'` `-` |
+| Punctuation | `.` `,` `!` `?` `'` `-` `&` `(` `)` `—` `"` `` ` `` `{` `}` `[` `]` `*` `=` `+` `@` `:` |
 
 Characters outside this set (other punctuation, whitespace beyond the plain space used to split words, non-Latin scripts, emoji) are silently skipped — they contribute no path and no width. Unsupported _uppercase_ input falls back to the lowercase glyph if one exists (e.g. an accidental extra capital); punctuation is matched exactly, with no case folding.
 

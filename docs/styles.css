@@ -698,6 +698,143 @@ pre code {
     grid-template-columns: repeat(6, max-content);
     overflow-x: auto;
     padding-bottom: 10px;
+    scrollbar-width: thin;
+  }
+}
+
+@media (max-width: 480px) {
+  .site-header,
+  footer,
+  .hero,
+  .section-grid,
+  .specimen-section,
+  .how-it-works,
+  .closing,
+  .install-strip,
+  .docs-layout {
+    width: min(100% - 24px, var(--max));
+  }
+  .site-header {
+    gap: 16px;
+  }
+  .wordmark {
+    width: 98px;
+  }
+  nav {
+    gap: 10px;
+    font-size: 0.78rem;
+  }
+  .hero {
+    padding: 48px 0 64px;
+  }
+  h1,
+  .docs-content h1 {
+    margin-bottom: 20px;
+    font-size: 3rem;
+  }
+  h2,
+  .docs-content h2 {
+    font-size: 2rem;
+  }
+  .hero-summary,
+  .section-intro > p:not(.eyebrow),
+  .docs-lead {
+    font-size: 1rem;
+  }
+  .hero-actions {
+    display: grid;
+    grid-template-columns: 1fr;
+    margin-top: 24px;
+  }
+  .hero-actions .button {
+    width: 100%;
+  }
+  .hero-canvas {
+    min-height: 230px;
+    padding: 24px;
+    box-shadow: 5px 5px 0 var(--cobalt);
+  }
+  .canvas-details {
+    font-size: 0.66rem;
+  }
+  .install-strip {
+    gap: 16px;
+    padding: 20px 0;
+  }
+  .install-list {
+    display: grid;
+    grid-template-columns: 1fr;
+  }
+  .copy-command {
+    width: 100%;
+    justify-content: space-between;
+  }
+  .copy-command code {
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+  .section-grid,
+  .how-it-works,
+  .closing {
+    padding: 72px 0;
+  }
+  .workbench {
+    gap: 20px;
+  }
+  .swatches {
+    justify-content: space-between;
+  }
+  .swatch {
+    width: 42px;
+    height: 42px;
+  }
+  .preview-stage {
+    min-height: 200px;
+    padding: 20px;
+    box-shadow: 6px 6px 0 var(--vermilion);
+  }
+  .specimen-section {
+    padding: 72px 0;
+  }
+  .specimen-grid {
+    grid-template-columns: 1fr;
+  }
+  .specimen {
+    min-height: 116px;
+  }
+  .variation-panel {
+    gap: 20px;
+  }
+  .variation-samples {
+    grid-template-columns: 1fr;
+  }
+  .variation-sample {
+    min-height: 82px;
+    border-right: 0;
+    border-bottom: 1px solid var(--ink);
+  }
+  .variation-sample:last-child {
+    border-bottom: 0;
+  }
+  .docs-layout {
+    gap: 28px;
+    padding: 48px 0 72px;
+  }
+  .docs-nav {
+    gap: 18px;
+  }
+  .docs-content section {
+    margin-top: 56px;
+  }
+  pre {
+    padding: 48px 16px 16px;
+  }
+  pre code {
+    font-size: 0.74rem;
+  }
+  .docs-demo {
+    min-height: 96px;
+    padding: 16px;
   }
 }
 

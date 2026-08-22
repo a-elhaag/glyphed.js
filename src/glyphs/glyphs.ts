@@ -81,6 +81,7 @@ import { punctBracketOpen } from "./punctuation/punct-bracket-open.js";
 import { punctBracketClose } from "./punctuation/punct-bracket-close.js";
 import { punctAsterisk } from "./punctuation/punct-asterisk.js";
 import { punctEquals } from "./punctuation/punct-equals.js";
+import { punctPlus } from "./punctuation/punct-plus.js";
 import { space } from "./space.js";
 
 export const glyphs: GlyphDatabase = {
@@ -165,4 +166,5 @@ export const glyphs: GlyphDatabase = {
   "]": punctBracketClose,
   "*": punctAsterisk,
   "=": punctEquals,
+  "+": punctPlus,
 };

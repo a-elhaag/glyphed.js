@@ -28,11 +28,12 @@
     <main class="docs-layout">
       <aside class="docs-nav" aria-label="Documentation navigation">
         <a href="#install">Install</a>
-        <a href="#quick-start">Quick start</a>
-        <a href="#api">API</a>
-        <a href="#react">React</a>
-        <a href="#ssr">SSR</a>
+        <a href="#quick-start">Start here</a>
+        <a href="#options">Options</a>
+        <a href="#api">Choose an API</a>
+        <a href="#frameworks">Frameworks</a>
         <a href="#glyphs">Glyphs</a>
+        <a href="#icons">Icons</a>
       </aside>
       <article class="docs-content">
         <p class="eyebrow">strokes.js documentation</p>
@@ -54,14 +55,17 @@ bun add strokes-js</code></pre>
         </section>
 
         <section id="quick-start">
-          <h2 class="handwritten-heading">Quick start</h2>
+          <h2 class="handwritten-heading">Start here</h2>
           <p>
-            <code>write()</code> renders text into an element and animates it
-            when it enters the viewport.
+            Use <code>write()</code>. It adds the SVG and draws it when the
+            element becomes visible. This is the right choice for most pages.
           </p>
-          <pre data-copy><code>import { write } from "strokes-js";
+          <pre
+            class="code-block"
+            data-copy
+          ><code><span class="token-keyword">import</span> { <span class="token-function">write</span> } <span class="token-keyword">from</span> <span class="token-string">"strokes-js"</span>;
 
-write("#hello", "Hello, world!");</code></pre>
+<span class="token-function">write</span>(<span class="token-string">"#hello"</span>, <span class="token-string">"Hello, world!"</span>);</code></pre>
           <div
             class="docs-demo"
             id="docs-demo"
@@ -69,79 +73,182 @@ write("#hello", "Hello, world!");</code></pre>
           ></div>
         </section>
 
-        <section id="api">
-          <h2 class="handwritten-heading">API</h2>
-          <dl class="api-list">
-            <div>
-              <dt><code>write(target, text, options?)</code></dt>
-              <dd>One-call DOM rendering and scroll-triggered animation.</dd>
-            </div>
-            <div>
-              <dt><code>renderText(text, options?)</code></dt>
-              <dd>Returns the SVG HTML string without accessing the DOM.</dd>
-            </div>
-            <div>
-              <dt><code>attach(element, options?)</code></dt>
-              <dd>
-                Triggers each rendered word through an
-                <code>IntersectionObserver</code>.
-              </dd>
-            </div>
-            <div>
-              <dt><code>animateWriting(element)</code></dt>
-              <dd>Immediately starts the stroke animation for a word.</dd>
-            </div>
-          </dl>
-          <p>
-            Set <code>animate: false</code> for fully drawn, static text. Set
-            <code>once: false</code> when your own render cycle should
-            re-trigger an observer.
-          </p>
+        <section id="options">
+          <p class="eyebrow">Two useful options</p>
+          <h2 class="handwritten-heading">
+            Change the behavior, not the setup.
+          </h2>
+          <div class="example-list">
+            <section class="example-item" aria-labelledby="static-example">
+              <div class="example-heading">
+                <p class="example-label">01</p>
+                <h3 id="static-example">Show it immediately</h3>
+              </div>
+              <p>Turn animation off for labels, compact UI, or reduced visual motion.</p>
+              <pre
+                class="code-block"
+                data-copy
+              ><code><span class="token-function">write</span>(<span class="token-string">"#label"</span>, <span class="token-string">"Already here"</span>, {
+  animate: <span class="token-boolean">false</span>,
+});</code></pre>
+            </section>
+
+            <section class="example-item" aria-labelledby="color-example">
+              <div class="example-heading">
+                <p class="example-label">02</p>
+                <h3 id="color-example">Change the ink</h3>
+              </div>
+              <p>Set one CSS property on the container. Every glyph inherits it.</p>
+              <pre
+                class="code-block"
+                data-copy
+              ><code><span class="token-selector">.announcement</span> {
+  <span class="token-property">--hw-color</span>: <span class="token-color">#c63d24</span>;
+}</code></pre>
+            </section>
+          </div>
         </section>
 
-        <section id="react">
-          <h2 class="handwritten-heading">React</h2>
+        <section id="api">
+          <h2 class="handwritten-heading">Choose an API</h2>
+          <p>There are three entry points. Pick one based on who owns the DOM and when the animation should start.</p>
+          <div class="api-choices">
+            <article class="api-choice">
+              <p class="choice-label">Recommended</p>
+              <h3><code>write()</code></h3>
+              <p>Use when the library can update the element for you.</p>
+            </article>
+            <article class="api-choice">
+              <p class="choice-label">Server or framework</p>
+              <h3><code>renderText()</code> + <code>attach()</code></h3>
+              <p>Use when you insert the HTML yourself, then want it to animate on view.</p>
+            </article>
+            <article class="api-choice">
+              <p class="choice-label">Your own trigger</p>
+              <h3><code>animateWriting()</code></h3>
+              <p>Use after <code>renderText()</code> when a click or route change should start the drawing.</p>
+            </article>
+          </div>
+          <details class="advanced-options">
+            <summary>Observer options</summary>
+            <p><code>root</code>, <code>rootMargin</code>, and <code>threshold</code> work like standard <code>IntersectionObserver</code> settings. Set <code>once: false</code> to observe again after the element leaves view.</p>
+          </details>
+        </section>
+
+        <section id="frameworks">
+          <h2 class="handwritten-heading">Frameworks and SSR</h2>
+          <h3>React</h3>
           <p>Render into a ref after mount. Re-render when the text changes.</p>
-          <pre data-copy><code>import { useEffect, useRef } from "react";
-import { write } from "strokes-js";
+          <pre
+            class="code-block"
+            data-copy
+          ><code><span class="token-keyword">import</span> { useEffect, useRef } <span class="token-keyword">from</span> <span class="token-string">"react"</span>;
+<span class="token-keyword">import</span> { <span class="token-function">write</span> } <span class="token-keyword">from</span> <span class="token-string">"strokes-js"</span>;
 
-export function Handwriting({ text }) {
-  const ref = useRef(null);
+<span class="token-keyword">export function</span> Handwriting({ text }) {
+  <span class="token-keyword">const</span> ref = <span class="token-function">useRef</span>(<span class="token-null">null</span>);
 
-  useEffect(() =&gt; {
-    write(ref.current, text);
+  <span class="token-function">useEffect</span>(() =&gt; {
+    <span class="token-function">write</span>(ref.current, text);
   }, [text]);
 
-  return &lt;span ref={ref} /&gt;;
+  <span class="token-keyword">return</span> &lt;span ref={ref} /&gt;;
 }</code></pre>
         </section>
 
-        <section id="ssr">
-          <h2 class="handwritten-heading">SSR</h2>
+          <h3>Server rendering</h3>
           <p>
             <code>renderText()</code> is pure string output, so it can run
             during server rendering. Call <code>attach()</code> after hydration
             when animation is needed.
           </p>
-          <pre data-copy><code>import { renderText } from "strokes-js";
+          <pre
+            class="code-block"
+            data-copy
+          ><code><span class="token-keyword">import</span> { <span class="token-function">renderText</span> } <span class="token-keyword">from</span> <span class="token-string">"strokes-js"</span>;
 
-const markup = renderText("Server-rendered ink", { animate: false });</code></pre>
+<span class="token-keyword">const</span> markup = <span class="token-function">renderText</span>(<span class="token-string">"Server-rendered ink"</span>, { animate: <span class="token-boolean">false</span> });</code></pre>
         </section>
 
         <section id="glyphs">
           <h2 class="handwritten-heading">Glyphs</h2>
           <p>
-            Coverage includes lowercase and uppercase English letters, digits,
-            and
-            <code>. , ! ? ' - & ( ) — " ` { } [ ] * = + @ :</code>. Unsupported
-            characters are skipped. To add one, create a glyph module and
-            register it in the glyph lookup.
+            Every supported character is a hand-drawn SVG path. Choose a set to
+            inspect its actual output. Unsupported characters are skipped.
+          </p>
+          <div class="glyph-browser" aria-label="Supported glyphs">
+            <div class="glyph-browser-toolbar">
+              <div
+                class="glyph-filters"
+                role="group"
+                aria-label="Glyph categories"
+              >
+                <button
+                  class="glyph-filter is-active"
+                  type="button"
+                  data-glyph-set="all"
+                >
+                  All
+                </button>
+                <button
+                  class="glyph-filter"
+                  type="button"
+                  data-glyph-set="lowercase"
+                >
+                  a-z
+                </button>
+                <button
+                  class="glyph-filter"
+                  type="button"
+                  data-glyph-set="uppercase"
+                >
+                  A-Z
+                </button>
+                <button
+                  class="glyph-filter"
+                  type="button"
+                  data-glyph-set="digits"
+                >
+                  0-9
+                </button>
+                <button
+                  class="glyph-filter"
+                  type="button"
+                  data-glyph-set="punctuation"
+                >
+                  Punctuation
+                </button>
+              </div>
+              <p class="glyph-count" id="glyph-count" aria-live="polite"></p>
+            </div>
+            <div class="glyph-grid" id="glyph-grid"></div>
+          </div>
+          <p class="glyph-note">
+            To add a character, create its glyph module and register it in the
+            lookup. All glyphs use the same 24-unit viewBox height.
           </p>
           <a
             class="button button-quiet"
             href="https://github.com/a-elhaag/strokes.js/issues"
             >Request a glyph or report an issue</a
           >
+        </section>
+
+        <section id="icons">
+          <h2 class="handwritten-heading">Icons</h2>
+          <p>
+            <code>renderIcon(name, options?)</code> draws a single named icon
+            the same way words draw in, one hand-drawn stroke at a time.
+            It is unreleased and not yet on npm. See the
+            <a href="./#icon-preview">home-page preview</a>.
+          </p>
+          <pre
+            class="code-block"
+            data-copy
+          ><code><span class="token-keyword">import</span> { <span class="token-function">renderIcon</span>, <span class="token-function">attach</span> } <span class="token-keyword">from</span> <span class="token-string">"strokes-js"</span>;
+
+el.innerHTML = <span class="token-function">renderIcon</span>(<span class="token-string">"check"</span>, { size: <span class="token-boolean">40</span> });
+<span class="token-function">attach</span>(el);</code></pre>
         </section>
       </article>
     </main>

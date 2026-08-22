@@ -1,4 +1,5 @@
 export { renderText, animateWriting, type RenderTextOptions } from "./renderer.js";
+export { renderIcon, type RenderIconOptions } from "./icon-renderer.js";
 export { attach, type AttachOptions } from "./observer.js";
 
 import { renderText, type RenderTextOptions } from "./renderer.js";

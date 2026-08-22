@@ -14,7 +14,7 @@ export function attach(el: HTMLElement, options: AttachOptions = {}): void {
   const observer = new IntersectionObserver((entries) => {
     for (const entry of entries) {
       if (!entry.isIntersecting) continue;
-      for (const word of entry.target.querySelectorAll(".hw-word")) {
+      for (const word of entry.target.querySelectorAll(".hw-word, .hw-icon")) {
         animateWriting(word);
       }
       if (once) observer.unobserve(entry.target);

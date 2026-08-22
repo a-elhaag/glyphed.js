@@ -28,7 +28,7 @@ const JITTER_BASELINE = 1;
 const JITTER_SCALE = 0.1;
 
 /** Small per-instance wobble (rotation, baseline drift, scale) layered on top of the picked variant, so no two renders of the same letter sit identically even when they share a path. */
-function randomJitter(): { rotate: number; dy: number; scale: number } {
+export function randomJitter(): { rotate: number; dy: number; scale: number } {
   return {
     rotate: (Math.random() * 2 - 1) * JITTER_ROTATE_DEG,
     dy: (Math.random() * 2 - 1) * JITTER_BASELINE,

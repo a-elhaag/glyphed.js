@@ -69,6 +69,18 @@ import { punctExclamation } from "./punctuation/punct-exclamation.js";
 import { punctQuestion } from "./punctuation/punct-question.js";
 import { punctApostrophe } from "./punctuation/punct-apostrophe.js";
 import { punctHyphen } from "./punctuation/punct-hyphen.js";
+import { punctAmpersand } from "./punctuation/punct-ampersand.js";
+import { punctParenOpen } from "./punctuation/punct-paren-open.js";
+import { punctParenClose } from "./punctuation/punct-paren-close.js";
+import { punctEmDash } from "./punctuation/punct-em-dash.js";
+import { punctQuote } from "./punctuation/punct-quote.js";
+import { punctBacktick } from "./punctuation/punct-backtick.js";
+import { punctBraceOpen } from "./punctuation/punct-brace-open.js";
+import { punctBraceClose } from "./punctuation/punct-brace-close.js";
+import { punctBracketOpen } from "./punctuation/punct-bracket-open.js";
+import { punctBracketClose } from "./punctuation/punct-bracket-close.js";
+import { punctAsterisk } from "./punctuation/punct-asterisk.js";
+import { punctEquals } from "./punctuation/punct-equals.js";
 import { space } from "./space.js";
 
 export const glyphs: GlyphDatabase = {
@@ -141,4 +153,16 @@ export const glyphs: GlyphDatabase = {
   "?": punctQuestion,
   "'": punctApostrophe,
   "-": punctHyphen,
+  "&": punctAmpersand,
+  "(": punctParenOpen,
+  ")": punctParenClose,
+  "—": punctEmDash,
+  '"': punctQuote,
+  "`": punctBacktick,
+  "{": punctBraceOpen,
+  "}": punctBraceClose,
+  "[": punctBracketOpen,
+  "]": punctBracketClose,
+  "*": punctAsterisk,
+  "=": punctEquals,
 };

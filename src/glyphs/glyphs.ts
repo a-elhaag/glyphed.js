@@ -83,6 +83,7 @@ import { punctAsterisk } from "./punctuation/punct-asterisk.js";
 import { punctEquals } from "./punctuation/punct-equals.js";
 import { punctPlus } from "./punctuation/punct-plus.js";
 import { punctAt } from "./punctuation/punct-at.js";
+import { punctColon } from "./punctuation/punct-colon.js";
 import { space } from "./space.js";
 
 export const glyphs: GlyphDatabase = {
@@ -169,4 +170,5 @@ export const glyphs: GlyphDatabase = {
   "=": punctEquals,
   "+": punctPlus,
   "@": punctAt,
+  ":": punctColon,
 };

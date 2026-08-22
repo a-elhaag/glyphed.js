@@ -615,20 +615,26 @@ pre code {
 }
 .icon-preview-stage {
   min-height: 250px;
-  display: flex;
-  flex-wrap: wrap;
-  align-content: center;
-  justify-content: center;
-  gap: 20px;
-  padding: 24px;
+  display: grid;
+  place-items: center;
   background: var(--code);
   border: 1px solid var(--ink);
   box-shadow: 8px 8px 0 var(--vermilion);
 }
 .icon-preview-stage .hw-icon {
-  width: 56px;
-  height: 56px;
-  stroke-width: 1.6;
+  width: 96px;
+  height: 96px;
+  stroke-width: 1.4;
+}
+#icon-select {
+  min-height: 34px;
+  padding: 6px 10px;
+  color: var(--ink);
+  background: var(--paper);
+  border: 1px solid var(--ink);
+  border-radius: 3px;
+  font-family: "Martian Mono", monospace;
+  font-size: 0.78rem;
 }
 .api-list {
   display: grid;

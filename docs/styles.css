@@ -221,25 +221,24 @@ h2 {
   transform: rotate(-2deg);
 }
 .hero-canvas #hero-writing {
-  min-height: 150px;
+  min-height: 190px;
   display: grid;
   align-content: center;
   transform: rotate(2deg);
 }
+.hero-canvas #hero-writing .hw-sentence,
+.hero-canvas #hero-writing .hw-token {
+  display: block !important;
+  width: 100%;
+}
 .hero-canvas .hw-word {
-  width: min(100%, 390px);
+  width: min(100%, 500px);
   height: auto;
 }
-.canvas-label,
 .canvas-details {
   margin: 0;
   font-family: "Martian Mono", monospace;
   font-size: 0.74rem;
-}
-.canvas-label {
-  color: var(--vermilion);
-  font-weight: 600;
-  text-transform: uppercase;
 }
 .canvas-details {
   display: flex;

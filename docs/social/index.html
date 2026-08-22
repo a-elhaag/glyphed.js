@@ -1,0 +1,264 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>strokes.js social post</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@500;600&family=IBM+Plex+Sans:wght@400;500;600&display=swap"
+      rel="stylesheet"
+    />
+    <style>
+      :root {
+        --paper: oklch(0.985 0.005 95);
+        --rule-blue: oklch(0.66 0.1 255);
+        --rule-red: oklch(0.6 0.18 25);
+        --ink: oklch(0.24 0.03 265);
+        --graphite: oklch(0.46 0.01 260);
+        --stamp: oklch(0.55 0.19 25);
+      }
+
+      * {
+        box-sizing: border-box;
+      }
+
+      html,
+      body {
+        width: 1080px;
+        height: 1350px;
+        margin: 0;
+        overflow: hidden;
+      }
+
+      body {
+        position: relative;
+        color: var(--ink);
+        background-color: var(--paper);
+        background-image: linear-gradient(var(--rule-blue) 1px, transparent 1px);
+        background-size: 100% 104px;
+        background-position: 0 220px;
+        background-repeat: repeat-y;
+        font-family: "IBM Plex Sans", sans-serif;
+      }
+
+      .margin-rule {
+        position: absolute;
+        top: 0;
+        bottom: 0;
+        left: 130px;
+        width: 2px;
+        background: var(--rule-red);
+        opacity: 0.55;
+      }
+
+      .binding-holes {
+        position: absolute;
+        top: 0;
+        bottom: 0;
+        left: 58px;
+        width: 14px;
+        display: flex;
+        flex-direction: column;
+        justify-content: space-evenly;
+        padding: 90px 0;
+      }
+
+      .binding-holes span {
+        width: 14px;
+        height: 14px;
+        border-radius: 50%;
+        border: 1.5px solid var(--graphite);
+        opacity: 0.3;
+      }
+
+      main {
+        position: relative;
+        min-height: 100%;
+        display: grid;
+        grid-template-rows: auto 1fr auto;
+        padding: 76px 84px 76px 172px;
+      }
+
+      .byline {
+        margin: 0;
+        color: var(--graphite);
+        font-family: "IBM Plex Mono", monospace;
+        font-size: 20px;
+        font-weight: 600;
+        letter-spacing: 0.02em;
+        text-transform: uppercase;
+      }
+
+      .stage {
+        position: relative;
+        align-self: center;
+      }
+
+      h1 {
+        position: relative;
+        display: inline-block;
+        max-width: 780px;
+        margin: 0;
+        font-size: 124px;
+        line-height: 0.98;
+      }
+
+      .underline {
+        position: absolute;
+        left: -4px;
+        top: 100%;
+        margin-top: 4px;
+        overflow: visible;
+      }
+
+      .hw-sentence {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 0;
+      }
+
+      .hw-word {
+        display: block;
+        width: auto;
+        max-width: 100%;
+        height: 1em;
+      }
+
+      .proof {
+        max-width: 46ch;
+        margin: 46px 0 0;
+        color: var(--graphite);
+        font-size: 32px;
+        font-weight: 400;
+        line-height: 1.4;
+      }
+
+      footer {
+        position: relative;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 32px;
+      }
+
+      .install {
+        margin: 0;
+        padding-bottom: 6px;
+        border-bottom: 2px solid var(--rule-red);
+        color: var(--ink);
+        font-family: "IBM Plex Mono", monospace;
+        font-size: 25px;
+        font-weight: 600;
+      }
+
+      .stamp-wrap {
+        position: relative;
+        width: 152px;
+        height: 152px;
+        transform: rotate(-9deg);
+      }
+
+      .stamp-wrap::before {
+        content: "";
+        position: absolute;
+        inset: -6px;
+        border-radius: 50%;
+        background: var(--stamp);
+        opacity: 0.06;
+        filter: blur(10px);
+      }
+
+      .stamp-ring {
+        position: absolute;
+        inset: 0;
+        width: 100%;
+        height: 100%;
+      }
+
+      .stamp-ring path {
+        fill: none;
+        stroke: var(--stamp);
+        stroke-width: 3;
+        opacity: 0.85;
+      }
+
+      .stamp-mark {
+        position: absolute;
+        inset: 0;
+        display: grid;
+        place-items: center;
+        font-size: 68px;
+      }
+
+      .stamp-mark .hw-word {
+        height: 1em;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="binding-holes" aria-hidden="true"><span></span><span></span><span></span></div>
+    <div class="margin-rule" aria-hidden="true"></div>
+    <main>
+      <p class="byline">strokes.js</p>
+      <section class="stage" aria-label="strokes.js demonstration">
+        <h1 id="writing" aria-label="Make it human.">Make it human.</h1>
+        <svg class="underline" id="underline" aria-hidden="true"></svg>
+        <p class="proof">Real glyph paths. A fresh hand every time.</p>
+      </section>
+      <footer>
+        <p class="install">npm install strokes-js</p>
+        <div class="stamp-wrap" aria-hidden="true">
+          <svg class="stamp-ring" viewBox="0 0 150 150">
+            <path
+              d="M137,75 C137,97 121,121 99,130 C77,139 53,135 34,122 C15,109 10,88 16,68 C22,48 40,32 62,22 C84,12 108,16 122,32 C136,48 137,53 137,75 Z"
+            />
+          </svg>
+          <div class="stamp-mark" id="mark"></div>
+        </div>
+      </footer>
+    </main>
+    <script type="module">
+      import { attach, renderText } from "https://cdn.jsdelivr.net/npm/strokes-js@0.2.3/+esm";
+
+      const STAGGER_MS = 60;
+      const STROKE_MS = 400;
+
+      function renderAnimated(target, text, color) {
+        target.style.setProperty("--hw-color", color);
+        target.innerHTML = renderText(text, { animate: true });
+        attach(target);
+      }
+
+      function drawDurationMs(text) {
+        return text.replace(/\s+/g, "").length * STAGGER_MS + STROKE_MS;
+      }
+
+      function drawUnderline(width) {
+        const svg = document.querySelector("#underline");
+        const w = Math.max(40, width);
+        svg.setAttribute("viewBox", `0 0 ${w} 24`);
+        svg.setAttribute("width", w);
+        svg.setAttribute("height", 24);
+        const d = `M4,12 C ${w * 0.22},2 ${w * 0.4},21 ${w * 0.6},9 S ${w * 0.85},1 ${w - 4},13`;
+        svg.innerHTML =
+          `<path d="${d}" stroke="var(--stamp)" fill="none" stroke-width="6" ` +
+          `stroke-linecap="round" pathLength="1" stroke-dasharray="1" stroke-dashoffset="1" ` +
+          `style="transition: stroke-dashoffset 480ms ease;" />`;
+        requestAnimationFrame(() =>
+          requestAnimationFrame(() => {
+            svg.querySelector("path").style.strokeDashoffset = "0";
+          }),
+        );
+      }
+
+      const writing = document.querySelector("#writing");
+      const headline = "Make it human.";
+      renderAnimated(writing, headline, "var(--ink)");
+      renderAnimated(document.querySelector("#mark"), "s", "var(--stamp)");
+
+      setTimeout(() => drawUnderline(writing.scrollWidth), drawDurationMs(headline) + 120);
+    </script>
+  </body>
+</html>

@@ -36,6 +36,7 @@
   "author": "Anas <anaselhaag@gmail.com>",
   "license": "ISC",
   "devDependencies": {
+    "playwright": "^1.62.1",
     "typescript": "^7.0.2"
   }
 }

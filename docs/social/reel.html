@@ -1,0 +1,403 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>strokes.js promo reel</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@500;600&family=IBM+Plex+Sans:wght@400;500;600&display=swap"
+      rel="stylesheet"
+    />
+    <style>
+      :root {
+        --paper: oklch(0.985 0.005 95);
+        --rule-blue: oklch(0.66 0.1 255);
+        --rule-red: oklch(0.6 0.18 25);
+        --ink: oklch(0.24 0.03 265);
+        --graphite: oklch(0.46 0.01 260);
+        --pen-red: oklch(0.55 0.19 25);
+        --pen-blue: oklch(0.48 0.17 258);
+      }
+
+      * {
+        box-sizing: border-box;
+      }
+
+      html,
+      body {
+        width: 1080px;
+        height: 1350px;
+        margin: 0;
+        overflow: hidden;
+      }
+
+      body {
+        color: var(--ink);
+        background-color: var(--paper);
+        font-family: "IBM Plex Sans", sans-serif;
+      }
+
+      .camera {
+        position: relative;
+        width: 100%;
+        height: 100%;
+        background-image: linear-gradient(var(--rule-blue) 1px, transparent 1px);
+        background-size: 100% 104px;
+        background-position: 0 220px;
+        background-repeat: repeat-y;
+        transform-origin: 38% 32%;
+        animation: kenburns var(--kb-duration, 20s) linear forwards;
+      }
+
+      @keyframes kenburns {
+        from {
+          transform: scale(1) translate(0, 0);
+        }
+        to {
+          transform: scale(1.06) translate(-1.5%, -1.5%);
+        }
+      }
+
+      .margin-rule {
+        position: absolute;
+        top: 0;
+        bottom: 0;
+        left: 130px;
+        width: 2px;
+        background: var(--rule-red);
+        opacity: 0.55;
+      }
+
+      .binding-holes {
+        position: absolute;
+        top: 0;
+        bottom: 0;
+        left: 58px;
+        width: 14px;
+        display: flex;
+        flex-direction: column;
+        justify-content: space-evenly;
+        padding: 90px 0;
+      }
+
+      .binding-holes span {
+        width: 14px;
+        height: 14px;
+        border-radius: 50%;
+        border: 1.5px solid var(--graphite);
+        opacity: 0.3;
+      }
+
+      main {
+        position: relative;
+        min-height: 100%;
+        display: grid;
+        grid-template-rows: auto 1fr auto;
+        padding: 76px 84px 76px 172px;
+      }
+
+      .byline {
+        margin: 0;
+        color: var(--graphite);
+        font-family: "IBM Plex Mono", monospace;
+        font-size: 20px;
+        font-weight: 600;
+        letter-spacing: 0.02em;
+        text-transform: uppercase;
+      }
+
+      .stage {
+        position: relative;
+        align-self: center;
+        opacity: 1;
+        transform: scale(1);
+        transition:
+          opacity 400ms ease,
+          transform 400ms ease;
+      }
+
+      .stage.is-fading {
+        opacity: 0;
+        transform: scale(0.97);
+      }
+
+      h1 {
+        position: relative;
+        display: inline-block;
+        max-width: 860px;
+        min-height: 128px;
+        margin: 0;
+        font-size: 112px;
+        line-height: 0.98;
+      }
+
+      .caret {
+        position: absolute;
+        top: 10px;
+        width: 7px;
+        height: 96px;
+        background: var(--accent, var(--pen-red));
+        border-radius: 3px;
+        opacity: 0;
+      }
+
+      .caret.is-blinking {
+        animation: caret-blink 0.9s steps(1) infinite;
+      }
+
+      @keyframes caret-blink {
+        0%,
+        49% {
+          opacity: 1;
+        }
+        50%,
+        100% {
+          opacity: 0;
+        }
+      }
+
+      .underline {
+        position: absolute;
+        left: -4px;
+        top: 100%;
+        margin-top: 2px;
+        overflow: visible;
+      }
+
+      .hw-sentence {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 0;
+      }
+
+      .hw-word {
+        display: block;
+        width: auto;
+        max-width: 100%;
+        height: 1em;
+      }
+
+      .proof {
+        max-width: 46ch;
+        min-height: 44px;
+        margin: 42px 0 0;
+        color: var(--graphite);
+        font-size: 30px;
+        font-weight: 400;
+        line-height: 1.4;
+      }
+
+      footer {
+        position: relative;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 32px;
+      }
+
+      .install {
+        margin: 0;
+        padding-bottom: 6px;
+        border-bottom: 2px solid var(--rule-red);
+        color: var(--ink);
+        font-family: "IBM Plex Mono", monospace;
+        font-size: 25px;
+        font-weight: 600;
+      }
+
+      .stamp-wrap {
+        position: relative;
+        width: 152px;
+        height: 152px;
+        transform: rotate(-9deg);
+      }
+
+      .stamp-wrap::before {
+        content: "";
+        position: absolute;
+        inset: -6px;
+        border-radius: 50%;
+        background: var(--accent, var(--pen-red));
+        opacity: 0.06;
+        filter: blur(10px);
+        transition: background 400ms ease;
+      }
+
+      .stamp-ring {
+        position: absolute;
+        inset: 0;
+        width: 100%;
+        height: 100%;
+      }
+
+      .stamp-ring path {
+        fill: none;
+        stroke: var(--accent, var(--pen-red));
+        stroke-width: 3;
+        opacity: 0.85;
+        transition: stroke 400ms ease;
+      }
+
+      .stamp-mark {
+        position: absolute;
+        inset: 0;
+        display: grid;
+        place-items: center;
+        font-size: 68px;
+      }
+
+      .stamp-mark .hw-word {
+        height: 1em;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="camera">
+      <div class="binding-holes" aria-hidden="true"><span></span><span></span><span></span></div>
+      <div class="margin-rule" aria-hidden="true"></div>
+      <main>
+        <p class="byline">strokes.js</p>
+        <section class="stage" aria-label="strokes.js demonstration">
+          <h1 id="writing">
+            <span id="writing-text"></span>
+            <span class="caret" id="caret"></span>
+          </h1>
+          <svg class="underline" id="underline" aria-hidden="true"></svg>
+          <p class="proof" id="proof"></p>
+        </section>
+        <footer>
+          <p class="install">npm install strokes-js</p>
+          <div class="stamp-wrap" id="stamp-wrap" aria-hidden="true">
+            <svg class="stamp-ring" viewBox="0 0 150 150">
+              <path
+                d="M137,75 C137,97 121,121 99,130 C77,139 53,135 34,122 C15,109 10,88 16,68 C22,48 40,32 62,22 C84,12 108,16 122,32 C136,48 137,53 137,75 Z"
+              />
+            </svg>
+            <div class="stamp-mark" id="mark"></div>
+          </div>
+        </footer>
+      </main>
+    </div>
+    <script type="module">
+      import { attach, renderText } from "https://cdn.jsdelivr.net/npm/strokes-js@0.2.3/+esm";
+
+      const STAGGER_MS = 60;
+      const STROKE_MS = 400;
+      const HOLD_MS = 1100;
+      const FADE_MS = 400;
+      const UNDERLINE_MS = 480;
+
+      const phrases = [
+        { h1: "Make it human.", proof: "Real glyph paths. A fresh hand every time.", pen: "red" },
+        { h1: "Write it by hand.", proof: "No fonts pretending to be handwriting.", pen: "blue" },
+        {
+          h1: "hi@strokes.js:",
+          proof: "Punctuation, symbols, every glyph gets a wobble.",
+          pen: "red",
+        },
+        { h1: "One import.", proof: "npm install strokes-js — that's it.", pen: "blue" },
+      ];
+
+      function drawDurationMs(text) {
+        return text.replace(/\s+/g, "").length * STAGGER_MS + STROKE_MS;
+      }
+
+      function renderAnimated(target, text) {
+        target.innerHTML = renderText(text, { animate: true });
+        attach(target);
+      }
+
+      const stage = document.querySelector(".stage");
+      const writing = document.querySelector("#writing");
+      const writingText = document.querySelector("#writing-text");
+      const caret = document.querySelector("#caret");
+      const underline = document.querySelector("#underline");
+      const proof = document.querySelector("#proof");
+      const mark = document.querySelector("#mark");
+
+      const wait = (ms) => new Promise((r) => setTimeout(r, ms));
+
+      function showCaret() {
+        caret.style.left = `${writingText.scrollWidth + 6}px`;
+        caret.style.height = `${writingText.clientHeight * 0.72}px`;
+        caret.classList.add("is-blinking");
+        caret.style.opacity = "1";
+      }
+
+      function hideCaret() {
+        caret.classList.remove("is-blinking");
+        caret.style.opacity = "0";
+      }
+
+      function drawUnderline(width) {
+        const w = Math.max(40, width);
+        underline.setAttribute("viewBox", `0 0 ${w} 24`);
+        underline.setAttribute("width", w);
+        underline.setAttribute("height", 24);
+        const d = `M4,12 C ${w * 0.22},2 ${w * 0.4},21 ${w * 0.6},9 S ${w * 0.85},1 ${w - 4},13`;
+        underline.innerHTML =
+          `<path d="${d}" stroke="var(--accent)" fill="none" stroke-width="6" ` +
+          `stroke-linecap="round" pathLength="1" stroke-dasharray="1" stroke-dashoffset="1" ` +
+          `style="transition: stroke-dashoffset ${UNDERLINE_MS}ms ease;" />`;
+        requestAnimationFrame(() =>
+          requestAnimationFrame(() => {
+            const path = underline.querySelector("path");
+            if (path) path.style.strokeDashoffset = "0";
+          }),
+        );
+      }
+
+      function clearUnderline() {
+        underline.innerHTML = "";
+      }
+
+      async function playPhrase({ h1, proof: proofText, pen }) {
+        const accent = pen === "blue" ? "var(--pen-blue)" : "var(--pen-red)";
+        stage.style.setProperty("--accent", accent);
+
+        hideCaret();
+        clearUnderline();
+        writing.setAttribute("aria-label", h1);
+        renderAnimated(writingText, h1);
+        proof.textContent = "";
+
+        const h1Draw = drawDurationMs(h1);
+        await wait(h1Draw);
+        showCaret();
+        drawUnderline(writingText.scrollWidth);
+        await wait(UNDERLINE_MS);
+        hideCaret();
+
+        renderAnimated(proof, proofText);
+        await wait(drawDurationMs(proofText) + HOLD_MS);
+
+        stage.classList.add("is-fading");
+        await wait(FADE_MS);
+        stage.classList.remove("is-fading");
+      }
+
+      function phraseDurationMs({ h1, proof: proofText }) {
+        return drawDurationMs(h1) + UNDERLINE_MS + drawDurationMs(proofText) + HOLD_MS + FADE_MS;
+      }
+
+      const camera = document.querySelector(".camera");
+      const stampWrap = document.querySelector("#stamp-wrap");
+      const totalMs = phrases.reduce((sum, p) => sum + phraseDurationMs(p), 0);
+      camera.style.setProperty("--kb-duration", `${totalMs}ms`);
+
+      async function loop() {
+        stampWrap.style.setProperty("--accent", "var(--pen-red)");
+        renderAnimated(mark, "s");
+        for (const phrase of phrases) {
+          await playPhrase(phrase);
+        }
+        window.reelDone = true;
+      }
+
+      window.reelConfig = { phrases, STAGGER_MS, STROKE_MS, HOLD_MS, FADE_MS, totalMs };
+      loop();
+    </script>
+  </body>
+</html>

@@ -84,7 +84,10 @@ bun add strokes-js</code></pre>
                 <p class="example-label">01</p>
                 <h3 id="static-example">Show it immediately</h3>
               </div>
-              <p>Turn animation off for labels, compact UI, or reduced visual motion.</p>
+              <p>
+                Turn animation off for labels, compact UI, or reduced visual
+                motion.
+              </p>
               <pre
                 class="code-block"
                 data-copy
@@ -98,7 +101,9 @@ bun add strokes-js</code></pre>
                 <p class="example-label">02</p>
                 <h3 id="color-example">Change the ink</h3>
               </div>
-              <p>Set one CSS property on the container. Every glyph inherits it.</p>
+              <p>
+                Set one CSS property on the container. Every glyph inherits it.
+              </p>
               <pre
                 class="code-block"
                 data-copy
@@ -111,7 +116,10 @@ bun add strokes-js</code></pre>
 
         <section id="api">
           <h2 class="handwritten-heading">Choose an API</h2>
-          <p>There are three entry points. Pick one based on who owns the DOM and when the animation should start.</p>
+          <p>
+            There are three entry points. Pick one based on who owns the DOM and
+            when the animation should start.
+          </p>
           <div class="api-choices">
             <article class="api-choice">
               <p class="choice-label">Recommended</p>
@@ -121,17 +129,29 @@ bun add strokes-js</code></pre>
             <article class="api-choice">
               <p class="choice-label">Server or framework</p>
               <h3><code>renderText()</code> + <code>attach()</code></h3>
-              <p>Use when you insert the HTML yourself, then want it to animate on view.</p>
+              <p>
+                Use when you insert the HTML yourself, then want it to animate
+                on view.
+              </p>
             </article>
             <article class="api-choice">
               <p class="choice-label">Your own trigger</p>
               <h3><code>animateWriting()</code></h3>
-              <p>Use after <code>renderText()</code> when a click or route change should start the drawing.</p>
+              <p>
+                Use after <code>renderText()</code> when a click or route change
+                should start the drawing.
+              </p>
             </article>
           </div>
           <details class="advanced-options">
             <summary>Observer options</summary>
-            <p><code>root</code>, <code>rootMargin</code>, and <code>threshold</code> work like standard <code>IntersectionObserver</code> settings. Set <code>once: false</code> to observe again after the element leaves view.</p>
+            <p>
+              <code>root</code>, <code>rootMargin</code>, and
+              <code>threshold</code> work like standard
+              <code>IntersectionObserver</code> settings. Set
+              <code>once: false</code> to observe again after the element leaves
+              view.
+            </p>
           </details>
         </section>
 
@@ -237,8 +257,8 @@ bun add strokes-js</code></pre>
           <h2 class="handwritten-heading">Icons</h2>
           <p>
             <code>renderIcon(name, options?)</code> draws a single named icon
-            the same way words draw in, one hand-drawn stroke at a time.
-            It is unreleased and not yet on npm. See the
+            the same way words draw in, one hand-drawn stroke at a time. It is
+            unreleased and not yet on npm. See the
             <a href="./#icon-preview">home-page preview</a>.
           </p>
           <pre

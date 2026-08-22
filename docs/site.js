@@ -2,7 +2,7 @@ import {
   attach,
   renderText,
   write,
-} from "https://cdn.jsdelivr.net/npm/strokes-js@0.1.4/+esm";
+} from "https://cdn.jsdelivr.net/npm/glyphed.js@1.0.0/+esm";
 
 const reduceMotion = window.matchMedia(
   "(prefers-reduced-motion: reduce)",
@@ -18,10 +18,10 @@ function renderAnimated(target, text, color, animate) {
 }
 
 const hero = document.querySelector("#hero-writing");
-if (hero) renderAnimated(hero, "strokes.js", "#c63d24", !reduceMotion);
+if (hero) renderAnimated(hero, "glyphed.js", "#c63d24", !reduceMotion);
 
 for (const wordmark of document.querySelectorAll(".wordmark")) {
-  renderAnimated(wordmark, "strokes.js", "#171b2e", !reduceMotion);
+  renderAnimated(wordmark, "glyphed.js", "#171b2e", !reduceMotion);
 }
 
 for (const heading of document.querySelectorAll(".handwritten-heading")) {

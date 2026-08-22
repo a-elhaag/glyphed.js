@@ -1,4 +1,4 @@
-# strokes-js
+# glyphed.js
 
 Renders text as animated hand-drawn SVG. Each letter is a real monoline glyph path (not a font), drawn in with a stroke animation as its word scrolls into view — with per-letter randomness (rotation, baseline drift, scale, and multiple hand-drawn variants per character) so the same word never renders identically twice.
 
@@ -10,7 +10,7 @@ Renders text as animated hand-drawn SVG. Each letter is a real monoline glyph pa
 ## Install
 
 ```bash
-npm install strokes-js
+npm install glyphed.js
 ```
 
 ## Usage
@@ -22,7 +22,7 @@ The simplest way to use the library: one call renders the text and wires up the 
 ```html
 <div id="hello"></div>
 <script type="module">
-  import { write } from "strokes-js";
+  import { write } from "glyphed.js";
 
   write("#hello", "Hello, world!");
 </script>
@@ -45,7 +45,7 @@ write("#hello", "Static text", { animate: false });
 For cases where you want the markup without the library touching the DOM directly (e.g. server-side rendering, or inserting the HTML yourself), use the two lower-level pieces `write()` is built from:
 
 ```js
-import { renderText, attach } from "strokes-js";
+import { renderText, attach } from "glyphed.js";
 
 const el = document.getElementById("hello");
 el.innerHTML = renderText("Hello, world!"); // animate: true by default
@@ -59,7 +59,7 @@ attach(el); // wires the scroll-triggered draw-in
 If you don't want scroll-triggering at all — e.g. you want the animation to start on a button click, a timer, or a route transition — skip `attach()` and call `animateWriting()` yourself on each rendered word:
 
 ```js
-import { renderText, animateWriting } from "strokes-js";
+import { renderText, animateWriting } from "glyphed.js";
 
 el.innerHTML = renderText("Hello, world!");
 button.addEventListener("click", () => {

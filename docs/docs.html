@@ -3,8 +3,8 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <meta name="description" content="Documentation for strokes.js." />
-    <title>Documentation | strokes.js</title>
+    <meta name="description" content="Documentation for glyphed.js." />
+    <title>Documentation | glyphed.js</title>
     <link rel="icon" href="./favicon.svg" type="image/svg+xml" />
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
@@ -16,12 +16,12 @@
   </head>
   <body>
     <header class="site-header">
-      <a class="wordmark" href="./" aria-label="strokes.js home"></a>
+      <a class="wordmark" href="./" aria-label="glyphed.js home"></a>
       <nav aria-label="Primary navigation">
         <a href="./#try-it">Try it</a>
         <a href="./docs.html" aria-current="page">Docs</a>
-        <a href="https://www.npmjs.com/package/strokes-js">npm</a>
-        <a href="https://github.com/a-elhaag/strokes.js/issues">Issues</a>
+        <a href="https://www.npmjs.com/package/glyphed.js">npm</a>
+        <a href="https://github.com/a-elhaag/glyphed.js/issues">Issues</a>
       </nav>
     </header>
 
@@ -35,7 +35,7 @@
         <a href="#glyphs">Glyphs</a>
       </aside>
       <article class="docs-content">
-        <p class="eyebrow">strokes.js documentation</p>
+        <p class="eyebrow">glyphed.js documentation</p>
         <h1 class="handwritten-heading">Write text that draws itself.</h1>
         <p class="docs-lead">
           A dependency-free ESM package for animated, hand-drawn SVG text.
@@ -47,10 +47,10 @@
             Choose the package manager already in your project. No separate
             publishing step is needed for pnpm, Yarn, or Bun.
           </p>
-          <pre data-copy><code>npm install strokes-js
-pnpm add strokes-js
-yarn add strokes-js
-bun add strokes-js</code></pre>
+          <pre data-copy><code>npm install glyphed.js
+pnpm add glyphed.js
+yarn add glyphed.js
+bun add glyphed.js</code></pre>
         </section>
 
         <section id="quick-start">
@@ -59,13 +59,13 @@ bun add strokes-js</code></pre>
             <code>write()</code> renders text into an element and animates it
             when it enters the viewport.
           </p>
-          <pre data-copy><code>import { write } from "strokes-js";
+          <pre data-copy><code>import { write } from "glyphed.js";
 
 write("#hello", "Hello, world!");</code></pre>
           <div
             class="docs-demo"
             id="docs-demo"
-            aria-label="Animated strokes.js example"
+            aria-label="Animated glyphed.js example"
           ></div>
         </section>
 
@@ -103,7 +103,7 @@ write("#hello", "Hello, world!");</code></pre>
           <h2 class="handwritten-heading">React</h2>
           <p>Render into a ref after mount. Re-render when the text changes.</p>
           <pre data-copy><code>import { useEffect, useRef } from "react";
-import { write } from "strokes-js";
+import { write } from "glyphed.js";
 
 export function Handwriting({ text }) {
   const ref = useRef(null);
@@ -123,7 +123,7 @@ export function Handwriting({ text }) {
             during server rendering. Call <code>attach()</code> after hydration
             when animation is needed.
           </p>
-          <pre data-copy><code>import { renderText } from "strokes-js";
+          <pre data-copy><code>import { renderText } from "glyphed.js";
 
 const markup = renderText("Server-rendered ink", { animate: false });</code></pre>
         </section>
@@ -139,16 +139,16 @@ const markup = renderText("Server-rendered ink", { animate: false });</code></pr
           </p>
           <a
             class="button button-quiet"
-            href="https://github.com/a-elhaag/strokes.js/issues"
+            href="https://github.com/a-elhaag/glyphed.js/issues"
             >Request a glyph or report an issue</a
           >
         </section>
       </article>
     </main>
     <footer>
-      <span>strokes.js</span>
+      <span>glyphed.js</span>
       <a href="./">Showcase</a>
-      <a href="https://www.npmjs.com/package/strokes-js">npm</a>
+      <a href="https://www.npmjs.com/package/glyphed.js">npm</a>
     </footer>
     <script type="module" src="./site.js"></script>
   </body>

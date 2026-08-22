@@ -1,6 +1,6 @@
 {
-  "name": "strokes-js",
-  "version": "0.2.3",
+  "name": "glyphed.js",
+  "version": "1.0.0",
   "description": "Renders text as animated hand-drawn SVG",
   "type": "module",
   "main": "dist/index.js",
@@ -22,10 +22,10 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/a-elhaag/strokes.js.git"
+    "url": "git+https://github.com/a-elhaag/glyphed.js.git"
   },
-  "homepage": "https://github.com/a-elhaag/strokes.js#readme",
-  "bugs": "https://github.com/a-elhaag/strokes.js/issues",
+  "homepage": "https://github.com/a-elhaag/glyphed.js#readme",
+  "bugs": "https://github.com/a-elhaag/glyphed.js/issues",
   "keywords": [
     "handwriting",
     "svg",

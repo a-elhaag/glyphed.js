@@ -3,7 +3,7 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <title>strokes.js promo reel</title>
+    <title>glyphed.js promo reel</title>
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link
@@ -258,8 +258,8 @@
       <div class="binding-holes" aria-hidden="true"><span></span><span></span><span></span></div>
       <div class="margin-rule" aria-hidden="true"></div>
       <main>
-        <p class="byline">strokes.js</p>
-        <section class="stage" aria-label="strokes.js demonstration">
+        <p class="byline">glyphed.js</p>
+        <section class="stage" aria-label="glyphed.js demonstration">
           <h1 id="writing">
             <span id="writing-text"></span>
             <span class="caret" id="caret"></span>
@@ -268,7 +268,7 @@
           <p class="proof" id="proof"></p>
         </section>
         <footer>
-          <p class="install">npm install strokes-js</p>
+          <p class="install">npm install glyphed.js</p>
           <div class="stamp-wrap" id="stamp-wrap" aria-hidden="true">
             <svg class="stamp-ring" viewBox="0 0 150 150">
               <path
@@ -281,7 +281,7 @@
       </main>
     </div>
     <script type="module">
-      import { attach, renderText } from "https://cdn.jsdelivr.net/npm/strokes-js@0.2.3/+esm";
+      import { attach, renderText } from "https://cdn.jsdelivr.net/npm/glyphed.js@1.0.0/+esm";
 
       const STAGGER_MS = 60;
       const STROKE_MS = 400;
@@ -293,11 +293,11 @@
         { h1: "Make it human.", proof: "Real glyph paths. A fresh hand every time.", pen: "red" },
         { h1: "Write it by hand.", proof: "No fonts pretending to be handwriting.", pen: "blue" },
         {
-          h1: "hi@strokes.js:",
+          h1: "hi@glyphed.js:",
           proof: "Punctuation, symbols, every glyph gets a wobble.",
           pen: "red",
         },
-        { h1: "One import.", proof: "npm install strokes-js — that's it.", pen: "blue" },
+        { h1: "One import.", proof: "npm install glyphed.js — that's it.", pen: "blue" },
       ];
 
       function drawDurationMs(text) {

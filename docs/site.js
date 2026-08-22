@@ -2,7 +2,7 @@ import {
   attach,
   renderText,
   write,
-} from "https://cdn.jsdelivr.net/npm/glyphed.js@1.0.0/+esm";
+} from "https://cdn.jsdelivr.net/npm/glyphed.js/+esm";
 
 const reduceMotion = window.matchMedia(
   "(prefers-reduced-motion: reduce)",

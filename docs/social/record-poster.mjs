@@ -9,7 +9,7 @@ import { fileURLToPath } from "node:url";
 
 const dir = path.dirname(fileURLToPath(import.meta.url));
 const pageUrl = "file://" + path.join(dir, "index.html");
-const videoDir = mkdtempSync(path.join(tmpdir(), "strokes-poster-"));
+const videoDir = mkdtempSync(path.join(tmpdir(), "glyphed-poster-"));
 
 // "Make it human." draws in ~1060ms (11 letters * 60ms stagger + 400ms stroke),
 // then the red underline sweep (~480ms) plus a beat to hold the finished poster.
@@ -32,7 +32,7 @@ const webmPath = await video.path();
 const outWebm = path.join(videoDir, "poster.webm");
 renameSync(webmPath, outWebm);
 
-const outGif = path.join(dir, "strokes-js-social.gif");
+const outGif = path.join(dir, "glyphed-js-social.gif");
 const paletteFile = path.join(videoDir, "palette.png");
 
 execFileSync("ffmpeg", [

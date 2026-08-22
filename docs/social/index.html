@@ -13,7 +13,6 @@
     <style>
       :root {
         --paper: oklch(0.985 0.005 95);
-        --rule-blue: oklch(0.66 0.1 255);
         --rule-red: oklch(0.6 0.18 25);
         --ink: oklch(0.24 0.03 265);
         --graphite: oklch(0.46 0.01 260);
@@ -36,41 +35,7 @@
         position: relative;
         color: var(--ink);
         background-color: var(--paper);
-        background-image: linear-gradient(var(--rule-blue) 1px, transparent 1px);
-        background-size: 100% 104px;
-        background-position: 0 220px;
-        background-repeat: repeat-y;
         font-family: "IBM Plex Sans", sans-serif;
-      }
-
-      .margin-rule {
-        position: absolute;
-        top: 0;
-        bottom: 0;
-        left: 130px;
-        width: 2px;
-        background: var(--rule-red);
-        opacity: 0.55;
-      }
-
-      .binding-holes {
-        position: absolute;
-        top: 0;
-        bottom: 0;
-        left: 58px;
-        width: 14px;
-        display: flex;
-        flex-direction: column;
-        justify-content: space-evenly;
-        padding: 90px 0;
-      }
-
-      .binding-holes span {
-        width: 14px;
-        height: 14px;
-        border-radius: 50%;
-        border: 1.5px solid var(--graphite);
-        opacity: 0.3;
       }
 
       main {
@@ -78,7 +43,7 @@
         min-height: 100%;
         display: grid;
         grid-template-rows: auto 1fr auto;
-        padding: 76px 84px 76px 172px;
+        padding: 76px 84px;
       }
 
       .byline {
@@ -198,8 +163,6 @@
     </style>
   </head>
   <body>
-    <div class="binding-holes" aria-hidden="true"><span></span><span></span><span></span></div>
-    <div class="margin-rule" aria-hidden="true"></div>
     <main>
       <p class="byline">glyphed.js</p>
       <section class="stage" aria-label="glyphed.js demonstration">

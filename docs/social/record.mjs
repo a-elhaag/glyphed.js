@@ -11,7 +11,7 @@ import { synthesizeReelAudio } from "./synth-audio.mjs";
 
 const dir = path.dirname(fileURLToPath(import.meta.url));
 const pageUrl = "file://" + path.join(dir, "reel.html");
-const videoDir = mkdtempSync(path.join(tmpdir(), "strokes-reel-"));
+const videoDir = mkdtempSync(path.join(tmpdir(), "glyphed-reel-"));
 
 const browser = await chromium.launch();
 const context = await browser.newContext({
@@ -30,11 +30,11 @@ await context.close();
 await browser.close();
 
 const webmPath = await video.path();
-const outWebm = path.join(dir, "strokes-js-reel.webm");
+const outWebm = path.join(dir, "glyphed-js-reel.webm");
 renameSync(webmPath, outWebm);
 
-const outMp4 = path.join(dir, "strokes-js-reel.mp4");
-const outGif = path.join(dir, "strokes-js-reel.gif");
+const outMp4 = path.join(dir, "glyphed-js-reel.mp4");
+const outGif = path.join(dir, "glyphed-js-reel.gif");
 const silentMp4 = path.join(videoDir, "silent.mp4");
 const wavPath = path.join(videoDir, "audio.wav");
 const paletteFile = path.join(videoDir, "palette.png");

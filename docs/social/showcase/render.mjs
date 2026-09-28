@@ -3,10 +3,10 @@
 //   npm run build && node docs/social/showcase/render.mjs
 //
 // Env: FPS (default 60), FROM / TO (seconds, for quick partial drafts), FFMPEG (ffmpeg binary),
-// CHROMIUM (browser executable), OUT (output mp4 path).
+// CHROMIUM (browser executable), OUT (output mp4 path), AUDIO_ONLY=1 (re-score the existing video).
 import { chromium } from "playwright";
 import { spawn } from "node:child_process";
-import { mkdtempSync, rmSync, writeFileSync } from "node:fs";
+import { mkdtempSync, renameSync, rmSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import path from "node:path";
 import { fileURLToPath, pathToFileURL } from "node:url";
@@ -35,6 +35,24 @@ page.on("pageerror", (e) => console.error("page error:", e.message));
 await page.goto(pathToFileURL(path.join(dir, "showcase.html")).href + "?render");
 await page.waitForFunction("window.__ready === true", null, { timeout: 30_000 });
 const meta = await page.evaluate("window.__meta");
+
+// AUDIO_ONLY=1: keep the existing video's picture, re-score it, and remux. For sound-only changes.
+if (process.env.AUDIO_ONLY) {
+  const events = await page.evaluate("window.__events");
+  await browser.close();
+  const wavPath = path.join(work, "score.wav");
+  const tmpOut = path.join(work, "remux.mp4");
+  writeFileSync(wavPath, scoreShowcase({ total: meta.total, events, scenes: meta.scenes }));
+  await run([
+    "-y", "-hide_banner", "-loglevel", "error", "-i", OUT, "-i", wavPath,
+    "-map", "0:v", "-map", "1:a", "-c:v", "copy", "-c:a", "aac", "-b:a", "192k", "-shortest",
+    "-movflags", "+faststart", tmpOut,
+  ]);
+  renameSync(tmpOut, OUT);
+  rmSync(work, { recursive: true, force: true });
+  console.log(`Re-scored ${OUT}`);
+  process.exit(0);
+}
 
 const from = Number(process.env.FROM || 0);
 const to = Math.min(Number(process.env.TO || meta.total), meta.total);

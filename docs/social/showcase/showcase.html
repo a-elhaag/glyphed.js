@@ -321,11 +321,10 @@
         el.querySelectorAll(".w > span").forEach((span, i) => {
           tween(span, t0 + i * stagger, 0.6, (e, p) => { e.style.transform = `translateY(${(1 - p) * 110}%) rotate(${(1 - p) * 8}deg)`; }, (p) => outBack(p, 1.4));
         });
-        cue("swish", t0);
       }
       function typeCode(el, t0, cps, parts) {
         const total = parts.reduce((n, [text]) => n + text.length, 0);
-        for (let i = 0; i < total; i += 2) cue("key", t0 + i / cps, { n: i });
+        for (let i = 0; i < total; i++) cue("key", t0 + i / cps, { n: i });
         tween(el, t0, total / cps, (e, p) => {
           let left = Math.round(p * total), html = "";
           for (const [text, cls] of parts) {
@@ -468,9 +467,8 @@
       function transition(atT, color) {
         const ball = makeBall(color, 46);
         const cx = 960, cy = 560;
-        cue("roll", atT - 1.0);
-        cue("riser", atT - 1.0);
-        cue("impact", atT);
+        cue("roll", atT - 1.0, { dur: 0.75 });
+        cue("swell", atT - 0.3);
         every((t) => {
           const p = seg(t, atT - 1.0, 0.75);
           if (t < atT - 1.0 || t >= atT - 0.25) { if (t < atT - 1.0 || t >= atT - 0.25) ball.hide(); }
@@ -592,7 +590,7 @@
           // Beat hops at 3.5 and 3.75 make a tiny sound too.
           cue("bounce", 3.5, { i: i + 4, level: 0.35 });
         });
-        cue("pop", 4.0, { chord: true, level: 1.2 });
+        cue("confetti", 4.0, { level: 1 });
         const tag = document.getElementById("s0-tag");
         tag.style.opacity = "0";
         slam(tag, 4.0, 1.6);
@@ -620,12 +618,12 @@
           mount(card, s + 0.2);
           card.style.opacity = "0";
           tween(card, s, 0.7, (e, p) => { e.style.opacity = String(clamp(p * 4)); e.style.transform = `rotateY(${(1 - p) * -100}deg) translateZ(0)`; }, (p) => outBack(p, 1.3));
-          cue("pop", s + 0.15, { deg: i, level: 0.8 });
+          cue("flip", s + 0.05, { i });
         });
         const code = document.getElementById("s1-code");
         code.style.opacity = "0";
         tween(code, t0 + 3.75, 0.7, (e, p) => { e.style.opacity = String(clamp(p * 3)); e.style.transform = `translateX(${(1 - p) * 320}px) rotate(${(1 - p) * 8}deg)`; }, (p) => outBack(p, 1.2));
-        cue("swish", t0 + 3.75);
+        cue("slide", t0 + 3.75);
         typeCode(code, t0 + 4.25, 30, [
           ["import", "k"], [" { ", "p"], ["write", "f"], [" } ", "p"], ["from", "k"], [' "glyphed.js"', "s"], [";\n\n", "p"],
           ["write", "f"], ["(", "p"], ['"#hero"', "s"], [", ", "p"], ['"a human hand."', "s"], [");", "p"],
@@ -722,7 +720,6 @@
             c.ic.style.transform = tf;
           }
         });
-        ripples.forEach((r0) => cue("sweep", r0));
         // Grid steps back; the inline sentence takes over.
         const back = document.getElementById("s2-back");
         tween(back, t0 + 5.25, 0.6, (e, p) => { e.style.opacity = String(1 - 0.88 * p); e.style.filter = `blur(${p * 4}px)`; e.style.transform = `scale(${1 - 0.06 * p})`; }, inOutCubic);
@@ -809,20 +806,13 @@
           annotationJobs.push({ el, type: el.dataset.mark, t: tm, seed: 20 + i, group: `mark${i}` });
           tween(el, tm, 0.5, (e, p) => (e.style.transform = `scale(${1 + 0.12 * Math.sin(p * Math.PI)}) rotate(${Math.sin(p * Math.PI) * -2}deg)`), (p) => p);
           tween(chips[el.dataset.mark], tm, 0.5, (e, p) => (e.style.transform = `scale(${outBack(p, 2.2)})`), (p) => p);
-          cue("pop", tm, { deg: i, level: 0.7 });
-          cue("marker", tm, { dur: 0.56 });
+          cue("tick", tm + 0.05, { i });
         });
         ["cross", "bracket"].forEach((n, i) => {
           tween(chips[n], t0 + 3.5 + i * 0.25, 0.5, (e, p) => (e.style.transform = `scale(${outBack(p, 2.2)})`), (p) => p);
-          cue("pop", t0 + 3.5 + i * 0.25, { deg: 5 + i, level: 0.5 });
+          cue("tick", t0 + 3.55 + i * 0.25, { i: 5 + i });
         });
         // Wave: every marked phrase jumps in turn, twice.
-        [t0 + 4.0, t0 + 5.0].forEach((w) => {
-          marks.forEach((el, i) => {
-            const s = w + i * (BEAT / 4);
-            cue("bounce", s + 0.12, { i, level: 0.45 });
-          });
-        });
         every((t) => {
           if (t < t0 + 4 || t > t0 + 6) return;
           marks.forEach((el, i) => {
@@ -860,13 +850,13 @@
         mount(donut, t0 + 2.5);
         const donutSvg = donut.querySelector("svg");
         tween(donutSvg, t0 + 2.5, 1.1, (e, p) => (e.style.transform = `rotate(${(1 - p) * -260}deg) scale(${lerp(0.4, 1, p)})`), (p) => outBack(p, 1.3));
-        cue("swish", t0 + 2.5);
+        cue("whoosh", t0 + 2.5, { dur: 0.9 });
         // Cards drop in and bounce, on the beat.
         document.querySelectorAll("#s-charts .card").forEach((card, i) => {
           const s = t0 + 0.25 + i * 0.25, d = 0.6875;
           card.style.opacity = "0";
           tween(card, s, d, (e, p) => { e.style.opacity = "1"; e.style.transform = `translateY(${(1 - p) * -760}px)`; }, outBounce);
-          BOUNCE_CONTACTS.slice(0, 3).forEach((c, k) => cue("bounce", s + c * d, { i: i + k, level: [0.9, 0.45, 0.25][k] }));
+          BOUNCE_CONTACTS.slice(0, 3).forEach((c, k) => cue("thud", s + c * d, { level: [1, 0.45, 0.2][k] }));
         });
         // Bars grow with overshoot, then pulse with the kick like an equaliser.
         const bars = [...bar.querySelectorAll(".hw-chart-mark")];
@@ -874,7 +864,6 @@
           g.style.transformBox = "view-box";
           g.style.transformOrigin = "0px 200px";
           const s = t0 + 1.25 + k * (BEAT / 4);
-          cue("pop", s, { deg: k, level: 0.45 });
         });
         const barBalls = bars.map((_, k) => makeBall(PALETTE[(k + 1) % PALETTE.length], 14));
         every((t) => {
@@ -919,8 +908,11 @@
         mount(toastIcon, t0 + 3.6);
         const toast = document.getElementById("toast");
         tween(toast, t0 + 3.5, 0.6, (e, p) => { e.style.opacity = String(clamp(p * 3)); e.style.transform = `translateY(${(1 - p) * 40}px) scale(${lerp(0.6, 1, p)})`; }, (p) => outBack(p, 2));
-        cue("click", t0 + 3.5);
-        cue("chime", t0 + 3.55);
+        cue("mouse-down", t0 + 2.5);
+        cue("mouse-up", t0 + 3.25);
+        cue("mouse-down", t0 + 3.5);
+        cue("mouse-up", t0 + 3.58);
+        cue("ding", t0 + 3.6);
         tween(hand, t0 + 3.5, 0.5, (e, p) => (e.style.transform = `translateY(${-Math.sin(p * Math.PI) * 3}px)`), (p) => p);
         const notes = document.getElementById("s5-notes");
         notes.style.opacity = "0";
@@ -969,7 +961,7 @@
         penBall("s6-logo", "#eaa221", 20, { from: t0 + 0.45, to: t0 + 1.6 });
         const install = document.getElementById("install");
         slam(install, t0 + 1.5, 1.5);
-        cue("impact", t0 + 1.5, { soft: true });
+        cue("thud", t0 + 1.62, { level: 0.6 });
         typeCode(document.getElementById("install-text"), t0 + 1.75, 30, [["npm install glyphed.js", ""]]);
         const features = document.getElementById("features");
         const feats = ["Zero dependencies", "SSR-safe strings", "TypeScript", "68 icons"].map((label, i) => {
@@ -1021,9 +1013,8 @@
         });
         for (let k = 0; k < 9; k++) cue("bounce", t0 + 1.5 + k * BEAT + 0.25, { i: k % 5, level: 0.5 });
         balls.forEach(({ x1 }, i) => burst(finale + 0.5, () => ({ x: x1, y: floorY - r - 420 }), { n: 16, speed: 700, life: 1.4 }));
-        cue("pop", finale + 0.5, { chord: true, level: 1.3 });
-        cue("finale", finale);
-        cue("outro", TOTAL - 1.1);
+        cue("confetti", finale + 0.5, { level: 1.3 });
+        cue("whoosh", TOTAL - 1.1, { dur: 0.8, down: true });
       }
 
       // ══ Camera ══════════════════════════════════════════════════════════════

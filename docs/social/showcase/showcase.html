@@ -119,8 +119,8 @@
 
       .code {
         font-family: "Martian Mono", monospace;
-        font-size: 24px;
-        line-height: 1.75;
+        font-size: 22px;
+        line-height: 1.8;
         white-space: pre;
         padding: 34px 40px;
         background: var(--card);
@@ -159,7 +159,8 @@
       .tagline .dim { color: var(--muted); font-weight: 400; }
 
       /* Text */
-      #s-text .cols { display: grid; grid-template-columns: 1.4fr 0.6fr; gap: 70px; align-items: start; margin-top: 60px; }
+      /* Fixed right column: the code types in over time and must not reflow the layout as it grows. */
+      #s-text .cols { display: grid; grid-template-columns: minmax(0, 1fr) 640px; gap: 70px; align-items: start; margin-top: 60px; }
       #s-text .hand-big { zoom: 4.1; --hw-color: var(--ink); }
       .variants { display: flex; gap: 80px; margin-top: 110px; align-items: center; }
       .variants .v { zoom: 3.8; }
@@ -248,6 +249,7 @@
         box-shadow: 12px 12px 0 var(--vermilion);
       }
       .install .dollar { color: var(--mint); }
+      #install-text { display: inline-block; min-width: 23ch; text-align: left; }
       .features { display: flex; justify-content: center; gap: 64px; margin-top: 64px; font-size: 30px; font-weight: 600; }
       .features .f { display: inline-flex; align-items: center; gap: 14px; --hw-color: var(--pine); }
       .url { margin-top: 48px; font-family: "Martian Mono", monospace; font-size: 24px; color: var(--muted); letter-spacing: 0.02em; }

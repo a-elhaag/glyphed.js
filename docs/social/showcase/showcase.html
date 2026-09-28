@@ -131,6 +131,44 @@
       .features .f .chk { width: 36px; height: 36px; }
       .features .f .lbl { opacity: 0; display: inline-block; }
       .url { margin-top: 44px; font-family: "Martian Mono", monospace; font-size: 24px; color: var(--muted); letter-spacing: 0.02em; opacity: 0; }
+
+      /* ── Vertical (9:16, Instagram Stories). Content stays inside the safe area: the top ~250px and
+         bottom ~300px are covered by the Stories UI. ── */
+      html.vertical, html.vertical body, html.vertical #frame { width: 1080px; height: 1920px; }
+      html.vertical .grid { background-size: 54px 54px; }
+      html.vertical .hud { top: 230px; left: 80px; right: 80px; }
+      html.vertical .scene { padding: 300px 80px 320px; }
+      html.vertical .headline { font-size: 66px; }
+      html.vertical .eyebrow { font-size: 19px; }
+      html.vertical #s-intro .center { top: 740px; }
+      html.vertical .logo { zoom: 5.4; }
+      html.vertical .tagline { font-size: 40px; margin-top: 64px; max-width: 860px; line-height: 1.3; }
+      html.vertical .tagline .dim { display: block; }
+      html.vertical #s1-hand { zoom: 4.6; margin-top: 30px; }
+      html.vertical .s1-row { flex-wrap: wrap; gap: 26px; margin-top: 90px; }
+      html.vertical .flip { width: 285px; height: 210px; }
+      html.vertical .flip .v { zoom: 3.4; }
+      html.vertical #s1-code { margin: 50px 0 0; font-size: 23px; }
+      html.vertical .icon-grid { grid-template-columns: repeat(6, 1fr); gap: 40px 0; margin-top: 70px; }
+      html.vertical .shortcode { top: 860px; }
+      html.vertical #sc-hand { zoom: 5; }
+      html.vertical .shortcode .chip { font-size: 17px; }
+      html.vertical .marks-text { font-size: 80px; max-width: 920px; margin-top: 90px; line-height: 1.55; }
+      html.vertical .mark-list { margin-top: 90px; gap: 14px; }
+      html.vertical .mark-list .chip { font-size: 24px; }
+      html.vertical .charts { grid-template-columns: 1fr; gap: 34px; margin-top: 50px; }
+      html.vertical .card { padding: 20px 22px 12px; }
+      html.vertical .card .plot { zoom: 1.35; }
+      html.vertical .spark-line { display: none; }
+      html.vertical #s5-hand { zoom: 4.8; margin-top: 30px; }
+      html.vertical #s-copy .headline { font-size: 80px; }
+      html.vertical .toast { left: 80px; top: 960px; font-size: 25px; padding: 26px 32px; }
+      html.vertical .copy-notes { left: 80px; top: 1170px; flex-direction: column; gap: 26px; font-size: 38px; }
+      html.vertical #s-outro .center { top: 560px; }
+      html.vertical #s6-logo { zoom: 6.2; }
+      html.vertical .install { font-size: 28px; padding: 20px 28px; }
+      html.vertical .features { flex-wrap: wrap; gap: 30px 50px; padding: 0 60px; font-size: 34px; margin-top: 70px; }
+      html.vertical .url { font-size: 26px; margin-top: 56px; }
     </style>
   </head>
   <body>
@@ -228,6 +266,13 @@
       // Everything is laid on a 120 BPM grid so the picture and the score hit together.
       const BEAT = 0.5;
       const TOTAL = 52;
+      // `?vertical` lays everything out for a 1080×1920 story instead of a 1920×1080 video.
+      const V = new URLSearchParams(location.search).has("vertical");
+      const W = V ? 1080 : 1920;
+      const H = V ? 1920 : 1080;
+      if (V) document.documentElement.classList.add("vertical");
+      for (const svg of document.querySelectorAll("svg.overlay")) svg.setAttribute("viewBox", `0 0 ${W} ${H}`);
+      const COVER = Math.hypot(W, H) / 2 + 60;
       const SCENES = [
         { id: "s-intro", from: 0, hud: "" },
         { id: "s-text", from: 6, hud: "01 / 05", color: "#c63d24" },
@@ -464,9 +509,10 @@
       // ══ Transitions: a ball rolls in, swells to fill the frame, then opens like an iris ══
       const iris = document.getElementById("iris");
       const irisCuts = [];
+      let endFocus = { x: W / 2, y: 330 };
       function transition(atT, color) {
         const ball = makeBall(color, 46);
-        const cx = 960, cy = 560;
+        const cx = W / 2, cy = V ? 980 : 560;
         cue("roll", atT - 1.0, { dur: 0.75 });
         cue("swell", atT - 0.3);
         every((t) => {
@@ -484,25 +530,26 @@
         let shown = false;
         for (const c of irisCuts) {
           if (t >= c.at - 0.25 && t < c.at) {
-            const r = lerp(46, 1250, inCubic(seg(t, c.at - 0.25, 0.25)));
+            const r = lerp(46, COVER, inCubic(seg(t, c.at - 0.25, 0.25)));
             iris.style.display = "block";
             iris.style.background = c.color;
             iris.style.clipPath = `circle(${r}px at ${c.cx}px ${c.cy}px)`;
             shown = true;
           } else if (t >= c.at && t < c.at + 0.5) {
-            const r = lerp(0, 1250, outCubic(seg(t, c.at, 0.5)));
+            const r = lerp(0, COVER, outCubic(seg(t, c.at, 0.5)));
             iris.style.display = "block";
             iris.style.background = c.color;
-            iris.style.clipPath = `path(evenodd, "M0 0 H1920 V1080 H0 Z M${c.cx - r} ${c.cy} a${r} ${r} 0 1 0 ${2 * r} 0 a${r} ${r} 0 1 0 ${-2 * r} 0 Z")`;
+            iris.style.clipPath = `path(evenodd, "M0 0 H${W} V${H} H0 Z M${c.cx - r} ${c.cy} a${r} ${r} 0 1 0 ${2 * r} 0 a${r} ${r} 0 1 0 ${-2 * r} 0 Z")`;
             shown = true;
           }
         }
         // Ending: ink closes in on the logo.
         if (t >= TOTAL - 1.1) {
-          const r = lerp(1300, 0, inOutCubic(seg(t, TOTAL - 1.1, 0.8)));
+          const r = lerp(COVER + 100, 0, inOutCubic(seg(t, TOTAL - 1.1, 0.8)));
+          const { x: ex, y: ey } = endFocus;
           iris.style.display = "block";
           iris.style.background = INK;
-          iris.style.clipPath = `path(evenodd, "M0 0 H1920 V1080 H0 Z M${960 - r} ${330} a${r} ${r} 0 1 0 ${2 * r} 0 a${r} ${r} 0 1 0 ${-2 * r} 0 Z")`;
+          iris.style.clipPath = `path(evenodd, "M0 0 H${W} V${H} H0 Z M${ex - r} ${ey} a${r} ${r} 0 1 0 ${2 * r} 0 a${r} ${r} 0 1 0 ${-2 * r} 0 Z")`;
           shown = true;
         }
         if (!shown) iris.style.display = "none";
@@ -510,10 +557,10 @@
 
       // ══ Chrome ══════════════════════════════════════════════════════════════
       const chrome = document.getElementById("chrome");
-      const cropMarks = [[60, 40, 60, 80], [40, 60, 80, 60], [1860, 40, 1860, 80], [1840, 60, 1880, 60], [60, 1000, 60, 1040], [40, 1020, 80, 1020], [1860, 1000, 1860, 1040], [1840, 1020, 1880, 1020]];
+      const cropMarks = [[60, 40, 60, 80], [40, 60, 80, 60], [W - 60, 40, W - 60, 80], [W - 80, 60, W - 40, 60], [60, H - 80, 60, H - 40], [40, H - 60, 80, H - 60], [W - 60, H - 80, W - 60, H - 40], [W - 80, H - 60, W - 40, H - 60]];
       chrome.innerHTML =
         cropMarks.map(([a, b, c, d], i) => `<path class="hw-stroke" d="${sketch(shapes.line(a, b, c, d), rnd, { roughness: 1.2 })}" stroke="${INK}" stroke-width="2.4" fill="none" stroke-linecap="round" pathLength="1" style="stroke-dasharray:1;stroke-dashoffset:1;visibility:hidden;transition:stroke-dashoffset 300ms ease ${100 + i * 40}ms" />`).join("") +
-        `<path id="progress" d="${sketch(shapes.line(150, 1036, 1770, 1036), rnd, { roughness: 1.4 })}" stroke="#c63d24" stroke-width="3" fill="none" stroke-linecap="round" pathLength="1" style="stroke-dasharray:1;stroke-dashoffset:1" />`;
+        `<path id="progress" d="${sketch(shapes.line(150, H - 44, W - 150, H - 44), rnd, { roughness: 1.4 })}" stroke="#c63d24" stroke-width="3" fill="none" stroke-linecap="round" pathLength="1" style="stroke-dasharray:1;stroke-dashoffset:1" />`;
       mount(chrome, 0);
       const progress = document.getElementById("progress");
 
@@ -530,9 +577,9 @@
 
       // ══ Scene 0 · intro ═════════════════════════════════════════════════════
       {
-        const floorY = 740;
+        const floorY = V ? 1180 : 740;
         const floor = document.getElementById("s0-floor");
-        floor.innerHTML = `<path class="hw-stroke" d="${sketch(shapes.line(560, floorY, 1360, floorY), rnd, { roughness: 2 })}" stroke="${INK}" stroke-width="3" fill="none" stroke-linecap="round" pathLength="1" style="stroke-dasharray:1;stroke-dashoffset:1;visibility:hidden;transition:stroke-dashoffset 450ms ease 0ms" />`;
+        floor.innerHTML = `<path class="hw-stroke" d="${sketch(shapes.line(W / 2 - 400, floorY, W / 2 + 400, floorY), rnd, { roughness: 2 })}" stroke="${INK}" stroke-width="3" fill="none" stroke-linecap="round" pathLength="1" style="stroke-dasharray:1;stroke-dashoffset:1;visibility:hidden;transition:stroke-dashoffset 450ms ease 0ms" />`;
         mount(floor, 0.05);
         const logo = document.getElementById("s0-logo");
         logo.innerHTML = renderText("glyphed.js", { copyable: false });
@@ -550,7 +597,7 @@
         const topY = logoBox.top + logoBox.height * 0.26 - r; // resting on the letters' x-height
         PALETTE.forEach((color, i) => {
           const ball = makeBall(color, r);
-          const x0 = 700 + i * 130;
+          const x0 = W / 2 - 260 + i * 130;
           const x1 = logoBox.left + logoBox.width * (0.08 + i * 0.21);
           const drop = i * 0.25, dropDur = 1.375;
           BOUNCE_CONTACTS.forEach((c, k) => cue("bounce", drop + c * dropDur, { i, level: [1, 0.55, 0.35, 0.2][k] }));
@@ -831,7 +878,7 @@
         const t0 = at("s-charts");
         transition(t0, "#077d62");
         words(document.getElementById("s4-head"), t0 + 0.25);
-        const size = { width: 360, height: 230 };
+        const size = V ? { width: 600, height: 200 } : { width: 360, height: 230 };
         const bar = document.getElementById("c-bar");
         bar.innerHTML = renderChart({ type: "bar", color: "#2458be", seed: 5, ...size, data: [
           { label: "Mon", value: 12 }, { label: "Tue", value: 19 }, { label: "Wed", value: 7 }, { label: "Thu", value: 15 }, { label: "Fri", value: 22 },
@@ -862,7 +909,7 @@
         const bars = [...bar.querySelectorAll(".hw-chart-mark")];
         bars.forEach((g, k) => {
           g.style.transformBox = "view-box";
-          g.style.transformOrigin = "0px 200px";
+          g.style.transformOrigin = `0px ${size.height - 30}px`; // bar baseline
           const s = t0 + 1.25 + k * (BEAT / 4);
         });
         const barBalls = bars.map((_, k) => makeBall(PALETTE[(k + 1) % PALETTE.length], 14));
@@ -931,8 +978,9 @@
         const move = seg(t, t0 + 2.0, 0.5);
         const drag = seg(t, t0 + 2.5, 0.75);
         const startX = first.left - 8, y = first.bottom + 6, endX = last.right + 4;
-        const x = drag > 0 ? startX + (endX - startX) * inOutCubic(drag) : 1500 + (startX - 1500) * outCubic(move);
-        const yy = drag > 0 ? y : 980 + (y - 980) * outCubic(move);
+        const [ex, ey] = [W * 0.78, H * 0.9];
+        const x = drag > 0 ? startX + (endX - startX) * inOutCubic(drag) : ex + (startX - ex) * outCubic(move);
+        const yy = drag > 0 ? y : ey + (y - ey) * outCubic(move);
         const click = t >= t0 + 3.5 && t < t0 + 3.62 ? 0.85 : 1;
         cursor.style.opacity = String(clamp(seg(t, t0 + 1.95, 0.2) - seg(t, t0 + 4.8, 0.3)));
         cursor.style.left = `${x}px`;
@@ -951,9 +999,9 @@
       {
         const t0 = at("s-outro");
         transition(t0, "#c63d24");
-        const floorY = 900;
+        const floorY = V ? 1440 : 900;
         const floor = document.getElementById("s6-floor");
-        floor.innerHTML = `<path class="hw-stroke" d="${sketch(shapes.line(520, floorY, 1400, floorY), rnd, { roughness: 2 })}" stroke="${INK}" stroke-width="3" fill="none" stroke-linecap="round" pathLength="1" style="stroke-dasharray:1;stroke-dashoffset:1;visibility:hidden;transition:stroke-dashoffset 450ms ease 0ms" />`;
+        floor.innerHTML = `<path class="hw-stroke" d="${sketch(shapes.line(W / 2 - 440, floorY, W / 2 + 440, floorY), rnd, { roughness: 2 })}" stroke="${INK}" stroke-width="3" fill="none" stroke-linecap="round" pathLength="1" style="stroke-dasharray:1;stroke-dashoffset:1;visibility:hidden;transition:stroke-dashoffset 450ms ease 0ms" />`;
         mount(floor, t0 + 0.2);
         const logo = document.getElementById("s6-logo");
         logo.innerHTML = renderText("glyphed.js", { copyable: false });
@@ -978,7 +1026,9 @@
         const url = document.getElementById("url");
         rise(url, t0 + 4.25, 0.7, 12);
         const r = 30;
-        const balls = PALETTE.map((c, i) => ({ b: makeBall(c, r), i, x1: 700 + i * 130 }));
+        const balls = PALETTE.map((c, i) => ({ b: makeBall(c, r), i, x1: W / 2 - 260 + i * 130 }));
+        // The closing iris lands on the middle of the logo, wherever the layout put it.
+        endFocus = measureIn("s-outro", () => centerOf(logo));
         const finale = t0 + 6.0;
         every((t) => {
           if (t < t0 || t > TOTAL) { balls.forEach(({ b }) => b.hide()); feats.forEach((f) => { f.ball.hide(); f.ring.set(0, 0, 0); }); return; }
@@ -992,7 +1042,7 @@
           for (const { b, i, x1 } of balls) {
             // Roll in from both sides, then juggle in a wave on the beat, then leap for the finale.
             const fromLeft = i < 2 || i === 2;
-            const start = fromLeft ? -80 - i * 90 : 2000 + (4 - i) * 90;
+            const start = fromLeft ? -80 - i * 90 : W + 80 + (4 - i) * 90;
             const pIn = outCubic(seg(t, t0 + 0.25, 1.0));
             let x = lerp(start, x1, pIn);
             let y = floorY - r;

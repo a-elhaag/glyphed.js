@@ -3,7 +3,8 @@
 //   npm run build && node docs/social/showcase/render.mjs
 //
 // Env: FPS (default 60), FROM / TO (seconds, for quick partial drafts), FFMPEG (ffmpeg binary),
-// CHROMIUM (browser executable), OUT (output mp4 path), AUDIO_ONLY=1 (re-score the existing video).
+// CHROMIUM (browser executable), OUT (output mp4 path), AUDIO_ONLY=1 (re-score the existing video),
+// VERTICAL=1 (1080×1920 cut for Instagram/TikTok stories; writes glyphed-js-showcase-vertical.mp4).
 import { chromium } from "playwright";
 import { spawn } from "node:child_process";
 import { mkdtempSync, renameSync, rmSync, writeFileSync } from "node:fs";
@@ -15,7 +16,9 @@ import { scoreShowcase } from "./audio.mjs";
 const dir = path.dirname(fileURLToPath(import.meta.url));
 const FPS = Number(process.env.FPS || 60);
 const FFMPEG = process.env.FFMPEG || "ffmpeg";
-const OUT = process.env.OUT || path.join(dir, "..", "glyphed-js-showcase.mp4");
+const VERTICAL = Boolean(process.env.VERTICAL);
+const [WIDTH, HEIGHT] = VERTICAL ? [1080, 1920] : [1920, 1080];
+const OUT = process.env.OUT || path.join(dir, "..", VERTICAL ? "glyphed-js-showcase-vertical.mp4" : "glyphed-js-showcase.mp4");
 const POSTER = OUT.replace(/\.mp4$/, "-poster.png");
 const work = mkdtempSync(path.join(tmpdir(), "glyphed-showcase-"));
 
@@ -30,9 +33,9 @@ const browser = await chromium.launch({
   ...(process.env.CHROMIUM ? { executablePath: process.env.CHROMIUM } : {}),
   args: ["--allow-file-access-from-files", "--font-render-hinting=none"],
 });
-const page = await browser.newPage({ viewport: { width: 1920, height: 1080 }, deviceScaleFactor: 1 });
+const page = await browser.newPage({ viewport: { width: WIDTH, height: HEIGHT }, deviceScaleFactor: 1 });
 page.on("pageerror", (e) => console.error("page error:", e.message));
-await page.goto(pathToFileURL(path.join(dir, "showcase.html")).href + "?render");
+await page.goto(pathToFileURL(path.join(dir, "showcase.html")).href + (VERTICAL ? "?render&vertical" : "?render"));
 await page.waitForFunction("window.__ready === true", null, { timeout: 30_000 });
 const meta = await page.evaluate("window.__meta");
 

@@ -353,7 +353,7 @@ It's rendered from `docs/social/showcase/showcase.html`, which uses the built pa
 npm run showcase   # needs ffmpeg with libx264 on PATH, or FFMPEG=/path/to/ffmpeg
 ```
 
-The renderer drives the page on a virtual clock and captures every frame, so output is smooth and identical on every run. Set `FPS`, `FROM`, and `TO` for quick partial drafts, or `AUDIO_ONLY=1` to re-score the existing video without re-rendering frames.
+The renderer drives the page on a virtual clock and captures every frame, so output is smooth and identical on every run. Set `FPS`, `FROM`, and `TO` for quick partial drafts, or `AUDIO_ONLY=1` to re-score the existing video without re-rendering frames. `VERTICAL=1 npm run showcase` renders the 1080×1920 story cut (`docs/social/glyphed-js-showcase-vertical.mp4`), laid out inside the Instagram Stories safe area; preview it with `showcase.html?vertical`.
 
 ## License
 

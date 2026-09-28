@@ -343,6 +343,18 @@ There is no test suite or lint script yet.
 
 Open it with any static file server, e.g. `npx serve .` then visit `/demo/`.
 
+## Showcase video
+
+`docs/social/glyphed-js-showcase.mp4` is a 49-second, 1080p60 tour of the library: handwriting, icons, annotations, charts, and copyable text, with a soundtrack scored from the drawing itself.
+
+It's rendered from `docs/social/showcase/showcase.html`, which uses the built package. Open that file directly to preview it in real time (add `?t=12` to start 12 seconds in). To render the video:
+
+```bash
+npm run showcase   # needs ffmpeg with libx264 on PATH, or FFMPEG=/path/to/ffmpeg
+```
+
+The renderer drives the page on a virtual clock and captures every frame, so output is smooth and identical on every run. Set `FPS`, `FROM`, and `TO` for quick partial drafts.
+
 ## License
 
 ISC

@@ -22,6 +22,7 @@
       <a class="wordmark" href="./" aria-label="glyphed.js home"></a>
       <nav aria-label="Primary navigation">
         <a href="#try-it">Try it</a>
+        <a href="#more-marks">Icons</a>
         <a href="./docs.html">Docs</a>
         <a href="https://www.npmjs.com/package/glyphed.js">npm</a>
         <a href="https://github.com/a-elhaag/glyphed.js/issues">Issues</a>
@@ -202,6 +203,47 @@ Make something human.</textarea
         </div>
       </section>
 
+      <section class="specimen-section sketch-section" id="more-marks" aria-labelledby="marks-title">
+        <div class="section-heading">
+          <div>
+            <p class="eyebrow">Same pen, more marks</p>
+            <h2 class="handwritten-heading" id="marks-title">
+              Icons, notes, and charts in the same hand.
+            </h2>
+          </div>
+          <button class="button button-quiet" id="redraw-marks" type="button">
+            Draw them again
+          </button>
+        </div>
+        <p class="sketch-lead">
+          Icons, annotations, and charts go through the letters' engine: same
+          24-unit grid, same pen width, same wobble and draw-in. Every render
+          is a slightly different hand.
+        </p>
+        <div class="icon-grid" id="icon-grid" aria-label="Hand-drawn icon set"></div>
+        <div class="sketch-row">
+          <div class="note-card">
+            <p class="eyebrow">annotate()</p>
+            <p class="note-text">
+              Mark <span data-mark="underline">what matters</span>,
+              <span data-mark="circle">circle</span> the key idea,
+              <span data-mark="highlight">highlight the proof</span>, and
+              <span data-mark="strike">hedge</span> nothing.
+              <span data-mark="box">Box it</span> when you're done.
+            </p>
+            <div class="inline-sample" id="inline-sample"></div>
+          </div>
+          <figure class="chart-card">
+            <div id="bar-chart"></div>
+            <figcaption>renderChart({ type: "bar" })</figcaption>
+          </figure>
+          <figure class="chart-card">
+            <div id="donut-chart"></div>
+            <figcaption>renderChart({ type: "donut" })</figcaption>
+          </figure>
+        </div>
+      </section>
+
       <section class="how-it-works section-grid" aria-labelledby="works-title">
         <div class="section-intro">
           <p class="eyebrow">Small by design</p>
@@ -257,5 +299,6 @@ Make something human.</textarea
     </footer>
 
     <script type="module" src="./site.js"></script>
+    <script type="module" src="./sketch.js"></script>
   </body>
 </html>

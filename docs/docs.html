@@ -30,6 +30,8 @@
         <a href="#install">Install</a>
         <a href="#quick-start">Quick start</a>
         <a href="#api">API</a>
+        <a href="#icons">Icons</a>
+        <a href="#marks">Marks &amp; charts</a>
         <a href="#react">React</a>
         <a href="#ssr">SSR</a>
         <a href="#glyphs">Glyphs</a>
@@ -97,6 +99,83 @@ write("#hello", "Hello, world!");</code></pre>
             <code>once: false</code> when your own render cycle should
             re-trigger an observer.
           </p>
+        </section>
+
+        <section id="icons">
+          <h2 class="handwritten-heading">Icons</h2>
+          <p>
+            68 icons drawn on the letters' 24-unit grid with the same pen. The
+            engine wobbles them on every render, so no two look stamped.
+            Import only the ones you use.
+          </p>
+          <pre data-copy><code>import { drawIcon, renderText } from "glyphed.js";
+import { rocket, heart, icons } from "glyphed.js/icons";
+
+drawIcon("#logo", rocket, { size: 48, label: "Launch" });
+
+// Inline, inside handwritten text:
+renderText("Ship it :rocket: with :heart:", { icons: { rocket, heart } });</code></pre>
+          <dl class="api-list">
+            <div>
+              <dt><code>renderIcon(icon, options?)</code></dt>
+              <dd>
+                SVG string. Options: <code>size</code>, <code>color</code>,
+                <code>strokeWidth</code>, <code>roughness</code>,
+                <code>seed</code>, <code>delay</code>, <code>label</code>,
+                <code>animate</code>.
+              </dd>
+            </div>
+            <div>
+              <dt><code>drawIcon(target, icon, options?)</code></dt>
+              <dd>Renders into an element and draws in on scroll.</dd>
+            </div>
+            <div>
+              <dt><code>icon(name, strokes)</code></dt>
+              <dd>
+                Define your own from path strings or the
+                <code>shapes</code> helpers.
+              </dd>
+            </div>
+          </dl>
+        </section>
+
+        <section id="marks">
+          <h2 class="handwritten-heading">Marks &amp; charts</h2>
+          <p>
+            Annotations and charts use the same engine and scroll trigger.
+          </p>
+          <pre data-copy><code>import { annotate, drawChart, renderSparkline } from "glyphed.js";
+
+annotate("#price", { type: "circle", color: "#c63d24" });
+
+drawChart("#stats", {
+  type: "bar",
+  data: [
+    { label: "Mon", value: 12 },
+    { label: "Tue", value: 19 },
+  ],
+});</code></pre>
+          <dl class="api-list">
+            <div>
+              <dt><code>annotate(target, options)</code></dt>
+              <dd>
+                <code>underline</code>, <code>circle</code>, <code>box</code>,
+                <code>highlight</code>, <code>strike</code>, <code>cross</code>,
+                <code>bracket</code>. Returns <code>{ redraw, remove }</code>.
+              </dd>
+            </div>
+            <div>
+              <dt><code>renderChart(options)</code> / <code>drawChart(target, options)</code></dt>
+              <dd>
+                <code>bar</code>, <code>line</code>, <code>pie</code>,
+                <code>donut</code> with hatched fills and handwritten labels.
+              </dd>
+            </div>
+            <div>
+              <dt><code>renderSparkline(values, options?)</code></dt>
+              <dd>A trend line one text-line tall, for inline use.</dd>
+            </div>
+          </dl>
         </section>
 
         <section id="react">

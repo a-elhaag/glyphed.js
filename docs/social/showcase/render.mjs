@@ -73,8 +73,8 @@ encoder.stdin.end();
 await encoded;
 process.stdout.write("\n");
 
-// Poster: the icon wall mid-draw reads best as a thumbnail.
-await page.evaluate((t) => window.__seek(t), Number(process.env.POSTER_AT || 16.1));
+// Poster: the icon wall mid-ripple reads best as a thumbnail.
+await page.evaluate((t) => window.__seek(t), Number(process.env.POSTER_AT || 18.3));
 await page.screenshot({ path: POSTER, type: "png" });
 
 const events = await page.evaluate("window.__events");

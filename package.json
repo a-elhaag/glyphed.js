@@ -1,6 +1,6 @@
 {
   "name": "glyphed.js",
-  "version": "2.0.0",
+  "version": "2.0.1",
   "description": "Renders text, icons, annotations and charts as animated hand-drawn SVG",
   "type": "module",
   "main": "dist/index.js",

@@ -31,6 +31,8 @@ export interface ChartOptions {
   animate?: boolean;
   roughness?: number;
   seed?: number;
+  /** Show a dot where each stroke will start before it draws (default false: strokes stay hidden until their turn). */
+  dots?: boolean;
 }
 
 /** Colorblind-checked categorical order (validated against the paper surface). */
@@ -56,6 +58,7 @@ class Canvas {
     readonly rng: Rng,
     readonly animate: boolean,
     readonly roughness: number,
+    readonly dots: boolean,
   ) {}
 
   stroke(d: string, opts: { color?: string; width?: number; duration?: number; opacity?: number; roughness?: number; advance?: number } = {}) {
@@ -63,6 +66,7 @@ class Canvas {
     const markup = strokePath({
       d: sketch(d, this.rng, { roughness: opts.roughness ?? this.roughness }),
       animate: this.animate,
+      dots: this.dots,
       delay: this.clock,
       duration,
       color: opts.color ?? INK,
@@ -85,7 +89,7 @@ class Canvas {
 
   /** Handwritten label. `y` is the vertical center of the text. */
   text(value: string, x: number, y: number, anchor: "start" | "middle" | "end", scale = LABEL_SCALE, maxWidth = Infinity) {
-    const layout = layoutLine(value, this.clock / STAGGER_MS, this.animate);
+    const layout = layoutLine(value, { delayOffset: this.clock / STAGGER_MS, animate: this.animate, dots: this.dots });
     const s = Math.min(scale, maxWidth / Math.max(layout.width, 1));
     const w = layout.width * s;
     const left = anchor === "start" ? x : anchor === "middle" ? x - w / 2 : x - w;
@@ -217,10 +221,11 @@ export function renderChart(options: ChartOptions): string {
     animate = true,
     roughness = 1,
     seed,
+    dots = false,
   } = options;
   const round = type === "pie" || type === "donut";
   const data = round ? foldOther(options.data, colors.length) : options.data;
-  const c = new Canvas(rngFor(seed), animate, roughness);
+  const c = new Canvas(rngFor(seed), animate, roughness, dots);
 
   if (type === "bar") barChart(c, data, width, height, { color, fill, format });
   else if (type === "line") lineChart(c, data, width, height, { color, fill, format });
@@ -257,11 +262,13 @@ export interface SparklineOptions {
   /** ms before it starts drawing — e.g. after the sentence it sits in. */
   delay?: number;
   label?: string;
+  /** Show a dot where each stroke will start before it draws (default false: strokes stay hidden until their turn). */
+  dots?: boolean;
 }
 
 /** A tiny hand-drawn trend line sized to sit inline with glyphed text. */
 export function renderSparkline(values: number[], options: SparklineOptions = {}): string {
-  const { width = 64, color = INK, animate = true, roughness = 1, seed, delay = 0, label } = options;
+  const { width = 64, color = INK, animate = true, roughness = 1, seed, delay = 0, label, dots } = options;
   const top = 5;
   const bottom = LETTER_HEIGHT - 4;
   const min = Math.min(...values);
@@ -272,8 +279,8 @@ export function renderSparkline(values: number[], options: SparklineOptions = {}
   const [ex, ey] = points[points.length - 1] ?? [0, 0];
   const strokes =
     points.length > 0 &&
-    strokePath({ d: sketch(curve(points, false, 0.45), rng, { roughness: roughness * 0.6 }), animate, delay, duration: 700, color, className: "hw-chart-stroke" }) +
-    strokePath({ d: sketch(circle(ex, ey, 1.6), rng, { roughness: 0.3 }), animate, delay: delay + 650, duration: 150, color, className: "hw-chart-stroke" });
+    strokePath({ d: sketch(curve(points, false, 0.45), rng, { roughness: roughness * 0.6 }), animate, dots, delay, duration: 700, color, className: "hw-chart-stroke" }) +
+    strokePath({ d: sketch(circle(ex, ey, 1.6), rng, { roughness: 0.3 }), animate, dots, delay: delay + 650, duration: 150, color, className: "hw-chart-stroke" });
   const a11y = label ? `role="img" aria-label="${escapeAttr(label)}"` : `aria-hidden="true"`;
 
   return (

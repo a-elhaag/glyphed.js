@@ -23,6 +23,8 @@ export interface RenderIconOptions {
   delay?: number;
   /** Accessible name. Without it the icon is decorative (`aria-hidden`). */
   label?: string;
+  /** Show a dot where each stroke will start before it draws (default false: strokes stay hidden until their turn). */
+  dots?: boolean;
 }
 
 /** Renders an icon as a hand-drawn <svg> string. Pure — no DOM needed, SSR-safe. */
@@ -36,6 +38,7 @@ export function renderIcon(icon: Icon, options: RenderIconOptions = {}): string 
     seed,
     delay = 0,
     label,
+    dots,
   } = options;
   const rng = rngFor(seed);
   const transform = jitterTransform(0, 0, 12, 12, randomJitter(rng, 0.5 * roughness));
@@ -44,6 +47,7 @@ export function renderIcon(icon: Icon, options: RenderIconOptions = {}): string 
       strokePath({
         d: sketch(d, rng, { roughness }),
         animate,
+        dots,
         delay: delay + i * ICON_STROKE_STAGGER_MS,
         color,
         width: strokeWidth,

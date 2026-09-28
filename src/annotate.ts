@@ -31,6 +31,8 @@ export interface AnnotationOptions {
   delay?: number;
   /** ms for each pass to draw (default scales with the mark's length). */
   duration?: number;
+  /** Show a dot where each stroke will start before it draws (default false: strokes stay hidden until their turn). */
+  dots?: boolean;
 }
 
 /** Margin around the element's box inside the overlay, so wobble and overshoot never clip. */
@@ -80,6 +82,7 @@ export function renderAnnotation(width: number, height: number, options: Annotat
     seed,
     animate = true,
     delay = 0,
+    dots,
   } = options;
   const rng = rngFor(seed);
   const highlight = type === "highlight";
@@ -97,6 +100,7 @@ export function renderAnnotation(width: number, height: number, options: Annotat
         strokePath({
           d: sketch(d, rng, { roughness: roughness * 1.4 }),
           animate,
+          dots,
           delay: delay + (pass * parts.length + i) * duration * 0.8,
           duration,
           color,

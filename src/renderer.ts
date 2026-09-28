@@ -6,6 +6,8 @@ import {
   STAGGER_MS,
   STROKE_CLASS,
   escapeAttr,
+  escapeText,
+  fmt,
   jitterTransform,
   randomJitter,
   strokePath,
@@ -47,16 +49,20 @@ export interface LineLayout {
   count: number;
 }
 
+export interface LineOptions {
+  /** Stagger slot the first mark starts at (each slot is one letter's delay). */
+  delayOffset?: number;
+  animate?: boolean;
+  icons?: Record<string, Icon>;
+  dots?: boolean;
+}
+
 /**
  * Lays out a run of characters (spaces included) as positioned stroke paths.
  * `:name:` shortcodes become inline icons when `icons` has that name.
  */
-export function layoutLine(
-  text: string,
-  delayOffset: number,
-  animate: boolean,
-  icons?: Record<string, Icon>,
-): LineLayout {
+export function layoutLine(text: string, options: LineOptions = {}): LineLayout {
+  const { delayOffset = 0, animate = true, icons, dots = false } = options;
   let x = 0;
   const paths: string[] = [];
   let index = 0;
@@ -70,7 +76,7 @@ export function layoutLine(
       const match = SHORTCODE.exec(chars.slice(i, i + 40).join(""));
       const icon = match && icons[match[1]];
       if (icon) {
-        paths.push(inlineIcon(icon, x, delay, animate));
+        paths.push(inlineIcon(icon, x, delay, animate, dots));
         x += INLINE_ICON_ADVANCE;
         index++;
         i += match[0].length - 1;
@@ -92,7 +98,7 @@ export function layoutLine(
 
     if (d) {
       const transform = jitterTransform(x, 0, width / 2, LETTER_HEIGHT / 2, randomJitter());
-      paths.push(strokePath({ d, transform, animate, delay, className: "hw-letter" }));
+      paths.push(strokePath({ d, transform, animate, delay, dots, className: "hw-letter" }));
     }
 
     x += width;
@@ -102,7 +108,7 @@ export function layoutLine(
   return { paths: paths.join(""), width: x, count: index };
 }
 
-function inlineIcon(icon: Icon, x: number, delay: number, animate: boolean): string {
+function inlineIcon(icon: Icon, x: number, delay: number, animate: boolean, dots: boolean): string {
   const transform = jitterTransform(
     x + INLINE_ICON_BEARING,
     (LETTER_HEIGHT - 24 * INLINE_ICON_SCALE) / 2,
@@ -116,6 +122,7 @@ function inlineIcon(icon: Icon, x: number, delay: number, animate: boolean): str
       strokePath({
         d: sketch(d),
         animate,
+        dots,
         delay: delay + i * ICON_STROKE_STAGGER_MS,
         // Compensate for the scale so icon ink matches letter ink.
         width: 2 / INLINE_ICON_SCALE,
@@ -126,25 +133,47 @@ function inlineIcon(icon: Icon, x: number, delay: number, animate: boolean): str
   return `<g transform="${transform}" class="hw-inline-icon">${strokes}</g>`;
 }
 
-function renderWord(
-  word: string,
-  delayOffset: number,
-  animate: boolean,
-  icons?: Record<string, Icon>,
-): { svg: string; letterCount: number } {
-  const { paths, width, count } = layoutLine(word, delayOffset, animate, icons);
+interface WordOptions extends LineOptions {
+  copyable: boolean;
+}
+
+/** Monospace advance at the copy layer's 20px size; used to stretch the text across the drawn word. */
+const COPY_FONT_PX = 20;
+const COPY_CHAR_PX = COPY_FONT_PX * 0.6;
+
+/**
+ * Invisible real text laid over the drawn word (pulled back over the svg with a negative margin), so
+ * selecting the handwriting highlights roughly the right area and copying gives the original characters.
+ * Kept in normal inline flow on purpose: absolutely positioned, flex, or in-SVG text makes browsers
+ * insert line breaks between words when copying. `overflow:hidden` puts its baseline at its bottom
+ * edge, the same place an inline svg sits, so the two line up without extra rules.
+ */
+function copyLayer(text: string, width: number): string {
+  const length = [...text].length;
+  if (!length || width <= 0) return "";
+  const spacing = (width - length * COPY_CHAR_PX) / length;
+  return (
+    `<span class="hw-copy" aria-hidden="true" style="display:inline-block;width:${fmt(width)}px;height:${LETTER_HEIGHT}px;` +
+    `margin-left:${fmt(-width)}px;overflow:hidden;color:transparent;white-space:pre;` +
+    `font:${COPY_FONT_PX}px/${LETTER_HEIGHT}px monospace;letter-spacing:${fmt(spacing)}px">${escapeText(text)}</span>`
+  );
+}
+
+function renderWord(word: string, options: WordOptions): { svg: string; letterCount: number } {
+  const { paths, width, count } = layoutLine(word, options);
   const svg =
     `<svg class="hw-word ${DRAW_CLASS}" xmlns="http://www.w3.org/2000/svg" width="${width}" height="${LETTER_HEIGHT}" ` +
-    `viewBox="0 0 ${width} ${LETTER_HEIGHT}" aria-hidden="true">${paths}</svg>`;
+    `viewBox="0 0 ${width} ${LETTER_HEIGHT}" aria-hidden="true">${paths}</svg>` +
+    (options.copyable ? copyLayer(word, width) : "");
 
   return { svg, letterCount: count };
 }
 
 function renderWhitespace(
   whitespace: string,
-  delayOffset: number,
-  animate: boolean,
+  options: WordOptions,
 ): { markup: string; letterCount: number } {
+  const delayOffset = options.delayOffset ?? 0;
   let letterCount = 0;
   const markup: string[] = [];
 
@@ -155,17 +184,28 @@ function renderWhitespace(
       continue;
     }
 
-    const { svg, letterCount: count } = renderWord(
-      chunk.replace(/\s/g, " "),
-      delayOffset + letterCount,
-      animate,
-    );
+    const { svg, letterCount: count } = renderWord(chunk.replace(/\s/g, " "), {
+      ...options,
+      icons: undefined,
+      delayOffset: delayOffset + letterCount,
+    });
     markup.push(svg);
     letterCount += count;
   }
 
   return { markup: markup.join(""), letterCount };
 }
+
+/**
+ * Browsers paint selected text in the selection color even when it's transparent, which would reveal
+ * the plain copy text over the handwriting; a translucent highlight keeps the ink visible beneath.
+ * `::selection` can't be set inline, so each copyable render
+ * carries this one rule (low specificity via :where, so page CSS can override it).
+ */
+const COPY_STYLE = `<style>:where(.hw-copy)::selection{color:transparent;-webkit-text-fill-color:transparent;background:rgba(66,133,244,.3)}</style>`;
+
+/** A word and the whitespace before it never wrap apart. Plain inline (not flex) so copied text has no stray line breaks. */
+const TOKEN_OPEN = `<span class="hw-token" style="white-space:nowrap">`;
 
 export interface RenderTextOptions {
   /** Draw letters in via stroke-dashoffset when the word scrolls into view (default true). Set false for static, fully-drawn output. */
@@ -175,6 +215,16 @@ export interface RenderTextOptions {
    * or just the ones you use: `{ icons: { rocket, heart } }`. Unknown shortcodes render as plain text.
    */
   icons?: Record<string, Icon>;
+  /**
+   * Show a dot where each stroke will start before the pen reaches it (default false). Round pen
+   * caps paint that dot on an undrawn stroke; off, every stroke stays hidden until its own turn.
+   */
+  dots?: boolean;
+  /**
+   * Put invisible real text over the handwriting so it can be selected and copied like normal
+   * text (default true). Set false for purely decorative output.
+   */
+  copyable?: boolean;
 }
 
 /**
@@ -186,7 +236,7 @@ export function renderText(
   text: string,
   options: RenderTextOptions = {},
 ): string {
-  const { animate = true, icons } = options;
+  const { animate = true, icons, dots = false, copyable = true } = options;
   const parts = splitText(text);
   let delayOffset = 0;
   const markup: string[] = [];
@@ -199,34 +249,27 @@ export function renderText(
     }
 
     const word = part;
-    const { svg, letterCount } = renderWord(word, delayOffset, animate, icons);
-    const { markup: space, letterCount: spaceCount } = renderWhitespace(
-      pendingWhitespace,
+    const { svg, letterCount } = renderWord(word, { delayOffset, animate, icons, dots, copyable });
+    const { markup: space, letterCount: spaceCount } = renderWhitespace(pendingWhitespace, {
       delayOffset,
       animate,
-    );
-    markup.push(
-      `<span class="hw-token" style="display:inline-flex;align-items:baseline">${space}${svg}</span>`,
-    );
+      dots,
+      copyable,
+    });
+    markup.push(`${TOKEN_OPEN}${space}${svg}</span>`);
     pendingWhitespace = "";
     delayOffset += spaceCount + letterCount;
   }
 
   if (pendingWhitespace) {
-    const { markup: space } = renderWhitespace(
-      pendingWhitespace,
-      delayOffset,
-      animate,
-    );
-    markup.push(
-      `<span class="hw-token" style="display:inline-flex;align-items:baseline">${space}</span>`,
-    );
+    const { markup: space } = renderWhitespace(pendingWhitespace, { delayOffset, animate, dots, copyable });
+    markup.push(`${TOKEN_OPEN}${space}</span>`);
   }
 
   const label = icons
     ? text.replace(/:([a-z0-9-]+):/g, (code, name: string) => (icons[name] ? name : code))
     : text;
-  return `<span class="hw-sentence" aria-label="${escapeAttr(label)}">${markup.join("")}</span>`;
+  return `<span class="hw-sentence" aria-label="${escapeAttr(label)}">${copyable ? COPY_STYLE : ""}${markup.join("")}</span>`;
 }
 
 /**
@@ -237,5 +280,7 @@ export function animateWriting(el: Element): void {
   el.classList.add("hw-visible");
   for (const path of el.querySelectorAll<SVGPathElement>(`.${STROKE_CLASS}`)) {
     path.style.strokeDashoffset = "0";
+    // Hidden strokes (dots: false) become visible exactly when their own delay starts.
+    path.style.visibility = "visible";
   }
 }

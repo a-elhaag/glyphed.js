@@ -174,6 +174,9 @@ Returns an HTML string: a `<span class="hw-sentence">` wrapping one `<svg class=
 | Option    | Type      | Default | Description                                                                                                                                                                                                                                         |
 | --------- | --------- | ------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | `animate` | `boolean` | `true`  | When `true`, each letter's path is rendered with `stroke-dasharray/dashoffset` primed for the draw-in transition (invisible until `animateWriting()` runs on it). When `false`, letters render fully drawn immediately, with no transition styling. |
+| `icons`   | `Record<string, Icon>` | — | Icons available as `:name:` shortcodes (see [Icons](#icons)). |
+| `dots`    | `boolean` | `false` | Show a dot where each stroke will start before the pen gets there (round caps paint one on every undrawn stroke). Off, each stroke stays hidden until its own turn, so the reader never sees what's coming. |
+| `copyable` | `boolean` | `true` | Lay invisible real text over the handwriting so it can be selected and copied like normal text. Set `false` for purely decorative output. |
 
 ### `attach(el, options?)`
 
@@ -204,20 +207,21 @@ Starts the draw-in transition immediately on a rendered `.hw-word` element (or a
 | `seed`        | `number`  | —                         | Repeatable drawing (e.g. match SSR and client).               |
 | `delay`       | `number`  | `0`                       | ms before the first stroke.                                   |
 | `label`       | `string`  | —                         | Accessible name; without it the icon is `aria-hidden`.        |
+| `dots`        | `boolean` | `false`                   | Show each stroke's start dot before it draws.                 |
 
 `drawIcon` also takes the `AttachOptions`.
 
 ### `annotate(target, options)` / `renderAnnotation(width, height, options)`
 
-Options: `type` (required), `color`, `strokeWidth`, `padding` (px, default 4), `passes` (times the pen goes over, default 1), `roughness`, `seed`, `animate`, `delay`, `duration`. `annotate` also takes the `AttachOptions` and returns `{ redraw(), remove() }`.
+Options: `type` (required), `color`, `strokeWidth`, `padding` (px, default 4), `passes` (times the pen goes over, default 1), `roughness`, `seed`, `animate`, `delay`, `duration`, `dots`. `annotate` also takes the `AttachOptions` and returns `{ redraw(), remove() }`.
 
 ### `renderChart(options)` / `drawChart(target, options)`
 
-Options: `type` (`"bar" | "line" | "pie" | "donut"`), `data` (`{ label, value, color? }[]`, non-negative values), `width` (360), `height` (220), `color` (bar/line), `colors` (pie/donut, default `chartPalette`), `fill` (`"hatch"` or `"none"`), `format` (value → label string), `title`, `animate`, `roughness`, `seed`.
+Options: `type` (`"bar" | "line" | "pie" | "donut"`), `data` (`{ label, value, color? }[]`, non-negative values), `width` (360), `height` (220), `color` (bar/line), `colors` (pie/donut, default `chartPalette`), `fill` (`"hatch"` or `"none"`), `format` (value → label string), `title`, `animate`, `roughness`, `seed`, `dots`.
 
 ### `renderSparkline(values, options?)`
 
-Options: `width` (64), `color`, `animate`, `roughness`, `seed`, `delay`, `label`.
+Options: `width` (64), `color`, `animate`, `roughness`, `seed`, `delay`, `label`, `dots`.
 
 ### `renderText` option: `icons`
 
@@ -225,7 +229,7 @@ Options: `width` (64), `color`, `animate`, `roughness`, `seed`, `delay`, `label`
 
 ## How the animation works
 
-Each letter is an SVG `<path>` with `pathLength="1"`, `stroke-dasharray:1`, and `stroke-dashoffset:1` — the path is drawn but entirely hidden behind its own dash gap. `animateWriting()` sets `stroke-dashoffset` to `0`, and a CSS `transition` (declared inline per-path, staggered by letter index) animates the stroke drawing in left to right, letter by letter, word by word. Stagger and stroke duration are fixed internally (60ms per letter offset, 400ms draw per letter) — not currently configurable via options.
+Each letter is an SVG `<path>` with `pathLength="1"`, `stroke-dasharray:1`, and `stroke-dashoffset:1` — the path is drawn but entirely hidden behind its own dash gap. A zero-length dash still gets its round cap painted, which would show as a dot at every undrawn stroke, so strokes also start `visibility:hidden` and flip visible (a `0s` transition) at the same moment their own draw begins — pass `dots: true` to keep the dots. `animateWriting()` sets `stroke-dashoffset` to `0`, and a CSS `transition` (declared inline per-path, staggered by letter index) animates the stroke drawing in left to right, letter by letter, word by word. Stagger and stroke duration are fixed internally (60ms per letter offset, 400ms draw per letter) — not currently configurable via options.
 
 ## Handwriting randomness
 
@@ -244,10 +248,24 @@ Both layers use `Math.random()` directly and are **not deterministic** — re-re
 | `hw-word`     | one `<svg>` per word        | The unit `attach()`/`animateWriting()` operate on.                                                                      |
 | `hw-letter`   | one `<path>` per letter     | Individual glyph stroke.                                                                                                |
 | `hw-stroke`   | every drawn `<path>`        | Letters, icon strokes, annotation and chart strokes — what `animateWriting()` reveals.                                  |
+| `hw-copy`     | one `<span>` per word       | Invisible selectable text over the drawn word (`copyable`).                                                             |
 | `hw-draw`     | every drawn `<svg>`         | What `attach()` looks for. Also: `hw-icon`, `hw-annotation`, `hw-chart`, `hw-sparkline`.                                |
 | `hw-visible`  | added to `hw-word` elements | Set by `animateWriting()` once triggered; useful as a CSS hook if you want to react to "this word has started drawing." |
 
 Color is the one themeable value, via the `--hw-color` custom property (see [Styling color](#styling-color)). Stroke width (`2`) and letter height (`24` units, viewBox-relative) are currently fixed, not configurable.
+
+## Copying text
+
+With `copyable` on (the default), each word carries a transparent `<span class="hw-copy">` holding the real characters, stretched over the drawn word. Selecting the handwriting highlights it like text, and copying gives the original string, spaces and line breaks included. Each copyable render also includes one small `<style>` rule so selected copy text stays invisible under a translucent highlight; override it with your own `.hw-copy::selection` rule.
+
+The copy layer is sized for words at their natural 24px height. If your CSS scales the word svgs (e.g. `height: 1em`), scale the copy layer by the same factor so the highlight lines up:
+
+```css
+.big .hw-word { height: 1em; width: auto; }
+.big .hw-copy { zoom: 2.667; } /* 64px font-size ÷ 24px word height */
+```
+
+Keep `.hw-sentence` and `.hw-token` inline (not flex or grid): browsers add line breaks between flex items when copying.
 
 ## Accessibility
 

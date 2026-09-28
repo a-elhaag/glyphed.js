@@ -3,7 +3,7 @@
 const local = new URLSearchParams(location.search).has("local");
 const base = local
   ? "../dist/"
-  : "https://cdn.jsdelivr.net/npm/glyphed.js@^1.1.0/dist/";
+  : "https://cdn.jsdelivr.net/npm/glyphed.js@^2.0.0/dist/";
 const suffix = local ? "" : "/+esm";
 
 const [{ annotate, attach, renderChart, renderIcon, renderSparkline, renderText }, { icons }] =

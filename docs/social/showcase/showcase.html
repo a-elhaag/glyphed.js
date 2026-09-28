@@ -1,0 +1,820 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=1920, initial-scale=1" />
+    <title>glyphed.js showcase</title>
+    <style>
+      @font-face { font-family: "Spline Sans"; font-weight: 400; src: url(fonts/spline-sans-latin-400-normal.woff2) format("woff2"); }
+      @font-face { font-family: "Spline Sans"; font-weight: 600; src: url(fonts/spline-sans-latin-600-normal.woff2) format("woff2"); }
+      @font-face { font-family: "Spline Sans"; font-weight: 700; src: url(fonts/spline-sans-latin-700-normal.woff2) format("woff2"); }
+      @font-face { font-family: "Martian Mono"; font-weight: 400; src: url(fonts/martian-mono-latin-400-normal.woff2) format("woff2"); }
+      @font-face { font-family: "Martian Mono"; font-weight: 600; src: url(fonts/martian-mono-latin-600-normal.woff2) format("woff2"); }
+
+      :root {
+        --paper: oklch(0.97 0.018 88);
+        --card: oklch(0.99 0.008 88);
+        --ink: oklch(0.19 0.025 255);
+        --muted: oklch(0.44 0.02 255);
+        --rule: oklch(0.9 0.012 88 / 0.55);
+        --vermilion: #c63d24;
+        --cobalt: #2458be;
+        --pine: #077d62;
+        --mint: oklch(0.84 0.09 165);
+        --hw-color: var(--ink);
+      }
+
+      * { box-sizing: border-box; }
+
+      html, body {
+        width: 1920px;
+        height: 1080px;
+        margin: 0;
+        overflow: hidden;
+        background: var(--paper);
+      }
+
+      body {
+        color: var(--ink);
+        font-family: "Spline Sans", sans-serif;
+        -webkit-font-smoothing: antialiased;
+      }
+
+      #frame {
+        position: relative;
+        width: 1920px;
+        height: 1080px;
+        overflow: hidden;
+        background-color: var(--paper);
+      }
+
+      .grid {
+        position: absolute;
+        inset: 0;
+        background-image:
+          linear-gradient(var(--rule) 1px, transparent 1px),
+          linear-gradient(90deg, var(--rule) 1px, transparent 1px);
+        background-size: 48px 48px;
+        background-position: -1px -1px;
+      }
+
+      .overlay { position: absolute; inset: 0; pointer-events: none; }
+
+      .hud {
+        position: absolute;
+        top: 52px;
+        left: 96px;
+        right: 96px;
+        display: flex;
+        justify-content: space-between;
+        font-family: "Martian Mono", monospace;
+        font-size: 17px;
+        font-weight: 600;
+        letter-spacing: 0.06em;
+        text-transform: uppercase;
+        color: var(--muted);
+        z-index: 5;
+      }
+
+      .scene {
+        position: absolute;
+        inset: 0;
+        display: none;
+        padding: 150px 150px 130px;
+        transform-origin: 50% 50%;
+      }
+
+      .eyebrow {
+        margin: 0 0 22px;
+        font-family: "Martian Mono", monospace;
+        font-size: 20px;
+        font-weight: 600;
+        letter-spacing: 0.08em;
+        text-transform: uppercase;
+        color: var(--vermilion);
+      }
+
+      .headline {
+        margin: 0;
+        font-size: 86px;
+        font-weight: 700;
+        line-height: 1.02;
+        letter-spacing: -0.02em;
+      }
+
+      .sub {
+        margin: 26px 0 0;
+        font-size: 30px;
+        line-height: 1.4;
+        color: var(--muted);
+        max-width: 30ch;
+      }
+
+      /* Word-by-word rise: each word slides up out of its own clip box. */
+      .w { display: inline-block; overflow: hidden; vertical-align: top; padding-bottom: 0.08em; margin-bottom: -0.08em; }
+      .w > span { display: inline-block; will-change: transform; }
+
+      .hand { line-height: 1.25; }
+      .hand .hw-sentence { white-space: normal; }
+
+      .code {
+        font-family: "Martian Mono", monospace;
+        font-size: 24px;
+        line-height: 1.75;
+        white-space: pre;
+        padding: 34px 40px;
+        background: var(--card);
+        border: 2px solid var(--ink);
+        box-shadow: 12px 12px 0 var(--mint);
+      }
+      .code .k { color: var(--cobalt); }
+      .code .s { color: var(--vermilion); }
+      .code .f { color: var(--pine); }
+      .code .p { color: var(--muted); }
+      .caret {
+        display: inline-block;
+        width: 12px;
+        height: 1.1em;
+        margin-left: 2px;
+        vertical-align: -0.18em;
+        background: var(--vermilion);
+      }
+
+      .chip {
+        display: inline-flex;
+        align-items: center;
+        gap: 12px;
+        padding: 12px 20px;
+        font-family: "Martian Mono", monospace;
+        font-size: 21px;
+        background: var(--card);
+        border: 2px solid var(--ink);
+      }
+
+      /* Intro */
+      #s-intro { display: none; place-items: center; text-align: center; }
+      #s-intro .center { position: absolute; left: 0; right: 0; top: 360px; text-align: center; }
+      .logo { zoom: 7.4; --hw-color: var(--ink); display: inline-block; position: relative; }
+      .tagline { margin-top: 56px; font-size: 42px; font-weight: 600; letter-spacing: -0.01em; }
+      .tagline .dim { color: var(--muted); font-weight: 400; }
+
+      /* Text */
+      #s-text .cols { display: grid; grid-template-columns: 1.4fr 0.6fr; gap: 70px; align-items: start; margin-top: 60px; }
+      #s-text .hand-big { zoom: 4.1; --hw-color: var(--ink); }
+      .variants { display: flex; gap: 80px; margin-top: 110px; align-items: center; }
+      .variants .v { zoom: 3.8; }
+      .variants-label { font-family: "Martian Mono", monospace; font-size: 22px; color: var(--muted); margin-top: 30px; letter-spacing: 0.04em; }
+
+      /* Icons */
+      .icon-grid { display: grid; grid-template-columns: repeat(12, 1fr); gap: 58px 0; margin-top: 90px; justify-items: center; }
+      .icon-grid svg { display: block; }
+      .shortcode {
+        position: absolute;
+        left: 0;
+        right: 0;
+        top: 500px;
+        text-align: center;
+      }
+      .shortcode .hand-sc { zoom: 5.6; --hw-color: var(--ink); display: inline-block; }
+      .shortcode .chip { margin-top: 40px; }
+      .icon-backdrop { position: relative; }
+
+      /* Annotations */
+      .marks-text {
+        margin: 70px 0 0;
+        max-width: 1600px;
+        font-size: 78px;
+        font-weight: 600;
+        line-height: 1.5;
+        letter-spacing: -0.015em;
+      }
+      .marks-text [data-mark] { position: relative; white-space: nowrap; --hw-color: var(--vermilion); }
+      .mark-list { display: flex; gap: 16px; margin-top: 90px; flex-wrap: wrap; }
+      .mark-list .chip { font-size: 21px; padding: 12px 18px; }
+
+      /* Charts */
+      .charts { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 46px; margin-top: 64px; }
+      .card {
+        position: relative;
+        padding: 26px 26px 20px;
+        background: var(--card);
+        border: 2px solid var(--ink);
+      }
+      .card:nth-child(1) { box-shadow: 12px 12px 0 var(--cobalt); }
+      .card:nth-child(2) { box-shadow: 12px 12px 0 var(--vermilion); }
+      .card:nth-child(3) { box-shadow: 12px 12px 0 var(--pine); }
+      .card h3 { margin: 0 0 6px; font-size: 26px; font-weight: 600; }
+      .card .cap { font-family: "Martian Mono", monospace; font-size: 16px; color: var(--muted); }
+      .card .plot { zoom: 1.24; margin: 10px 0 4px; --hw-color: var(--ink); }
+      .spark-line { display: flex; align-items: center; gap: 26px; margin-top: 70px; font-size: 38px; font-weight: 600; }
+      .spark-line .spark { zoom: 2.6; }
+      .spark-line .num { font-family: "Martian Mono", monospace; font-size: 30px; color: var(--pine); }
+
+      /* Copy */
+      #s-copy .hand-copy { zoom: 6.2; --hw-color: var(--ink); /* zoom scales margins too: 12px here is ~74px on screen */ margin-top: 12px; display: inline-block; position: relative; }
+      .cursor { position: absolute; width: 44px; height: 44px; z-index: 8; opacity: 0; }
+      .toast {
+        position: absolute;
+        left: 150px;
+        top: 640px;
+        display: flex;
+        align-items: center;
+        gap: 22px;
+        padding: 22px 30px;
+        background: var(--ink);
+        color: var(--paper);
+        font-family: "Martian Mono", monospace;
+        font-size: 24px;
+        --hw-color: var(--mint);
+        opacity: 0;
+      }
+      .toast q { color: var(--mint); }
+      .copy-notes { position: absolute; left: 150px; top: 790px; display: flex; gap: 60px; font-size: 26px; color: var(--muted); }
+      .copy-notes b { color: var(--ink); font-weight: 600; }
+
+      /* Outro */
+      #s-outro .center { position: absolute; left: 0; right: 0; top: 250px; text-align: center; }
+      #s-outro .logo { zoom: 6.4; }
+      .install {
+        display: inline-flex;
+        align-items: center;
+        gap: 18px;
+        margin-top: 56px;
+        padding: 22px 34px;
+        font-family: "Martian Mono", monospace;
+        font-size: 34px;
+        background: var(--ink);
+        color: var(--paper);
+        box-shadow: 12px 12px 0 var(--vermilion);
+      }
+      .install .dollar { color: var(--mint); }
+      .features { display: flex; justify-content: center; gap: 64px; margin-top: 64px; font-size: 30px; font-weight: 600; }
+      .features .f { display: inline-flex; align-items: center; gap: 14px; --hw-color: var(--pine); }
+      .url { margin-top: 48px; font-family: "Martian Mono", monospace; font-size: 24px; color: var(--muted); letter-spacing: 0.02em; }
+    </style>
+  </head>
+  <body>
+    <div id="frame">
+      <div class="grid"></div>
+      <svg class="overlay" id="chrome" viewBox="0 0 1920 1080" style="z-index: 4"></svg>
+      <div class="hud"><span id="hud-left">glyphed.js</span><span id="hud-right">v1.1</span></div>
+
+      <section class="scene" id="s-intro">
+        <div class="center">
+          <div class="logo" id="intro-logo"></div>
+          <div class="tagline" id="intro-tag">Animated, hand-drawn SVG. <span class="dim">For text, icons, notes, and charts.</span></div>
+        </div>
+      </section>
+
+      <section class="scene" id="s-text">
+        <p class="eyebrow">01 — Handwriting</p>
+        <div class="cols">
+          <div>
+            <div class="hand hand-big" id="text-hand"></div>
+            <div class="variants" id="text-variants"></div>
+            <div class="variants-label" id="variants-label">Same word. A different hand every render.</div>
+          </div>
+          <div>
+            <h2 class="headline" id="text-head" style="font-size: 62px">Real glyph paths.<br />Not a font.</h2>
+            <p class="sub" id="text-sub">Every letter is a monoline SVG stroke with its own wobble, drawn in as it scrolls into view.</p>
+            <pre class="code" id="text-code" style="margin-top: 44px"></pre>
+          </div>
+        </div>
+      </section>
+
+      <section class="scene" id="s-icons">
+        <p class="eyebrow">02 — Icons</p>
+        <h2 class="headline" id="icons-head">68 icons. Same pen.</h2>
+        <div class="icon-backdrop">
+          <div class="icon-grid" id="icon-grid"></div>
+        </div>
+        <div class="shortcode" id="shortcode">
+          <div class="hand-sc" id="sc-hand"></div><br />
+          <span class="chip" id="sc-chip">renderText("Ship it :rocket: with :heart:", { icons })</span>
+        </div>
+      </section>
+
+      <section class="scene" id="s-marks">
+        <p class="eyebrow">03 — Annotations</p>
+        <h2 class="headline" id="marks-head">Mark what matters.</h2>
+        <p class="marks-text" id="marks-text">
+          <span data-mark="underline">Underline</span> the point,
+          <span data-mark="circle">circle</span> the idea,
+          <span data-mark="highlight">highlight the proof</span>,
+          <span data-mark="strike">strike the noise</span>, and
+          <span data-mark="box">box the answer</span>.
+        </p>
+        <div class="mark-list" id="mark-list"></div>
+      </section>
+
+      <section class="scene" id="s-charts">
+        <p class="eyebrow">04 — Charts</p>
+        <h2 class="headline" id="charts-head">Charts in the same hand.</h2>
+        <div class="charts">
+          <div class="card"><h3>Commits</h3><div class="cap">renderChart({ type: "bar" })</div><div class="plot" id="chart-bar"></div></div>
+          <div class="card"><h3>Visitors</h3><div class="cap">renderChart({ type: "line" })</div><div class="plot" id="chart-line"></div></div>
+          <div class="card"><h3>Where the week went</h3><div class="cap">renderChart({ type: "donut" })</div><div class="plot" id="chart-donut"></div></div>
+        </div>
+        <div class="spark-line" id="spark-line">Stars this week <span class="spark" id="spark"></span><span class="num">+128</span></div>
+      </section>
+
+      <section class="scene" id="s-copy">
+        <p class="eyebrow">05 — Real text underneath</p>
+        <h2 class="headline" id="copy-head">Drawn by hand. Copies like text.</h2>
+        <div class="hand hand-copy" id="copy-hand"></div>
+        <svg class="cursor" id="cursor" viewBox="0 0 24 24"></svg>
+        <div class="toast" id="toast"><span id="toast-icon"></span><span>Copied <q>Select it. Copy it.</q></span></div>
+        <div class="copy-notes" id="copy-notes">
+          <span><b>No dots</b> ahead of the pen</span>
+          <span><b>Screen readers</b> get the words</span>
+          <span><b>SSR</b> friendly strings</span>
+        </div>
+      </section>
+
+      <section class="scene" id="s-outro">
+        <div class="center">
+          <div class="logo" id="outro-logo"></div><br />
+          <div class="install" id="install"><span class="dollar">$</span><span id="install-text"></span></div>
+          <div class="features" id="features"></div>
+          <div class="url" id="url">github.com/a-elhaag/glyphed.js</div>
+        </div>
+      </section>
+
+      <svg class="overlay" id="wipe" viewBox="0 0 1920 1080" style="z-index: 20"></svg>
+    </div>
+
+    <script type="module">
+      import {
+        renderText,
+        renderIcon,
+        renderChart,
+        renderAnnotation,
+        renderSparkline,
+        sketch,
+        shapes,
+      } from "../../../dist/index.js";
+      import { icons } from "../../../dist/icons/index.js";
+
+      // ── Timeline ─────────────────────────────────────────────────────────────
+      const SCENES = [
+        { id: "s-intro", from: 0, to: 5.2, hud: "" },
+        { id: "s-text", from: 5.2, to: 12.4, hud: "01 / 05" },
+        { id: "s-icons", from: 12.4, to: 20.2, hud: "02 / 05" },
+        { id: "s-marks", from: 20.2, to: 27.8, hud: "03 / 05" },
+        { id: "s-charts", from: 27.8, to: 35.8, hud: "04 / 05" },
+        { id: "s-copy", from: 35.8, to: 41.8, hud: "05 / 05" },
+        { id: "s-outro", from: 41.8, to: 49, hud: "" },
+      ];
+      const TOTAL = 49;
+      const WIPE = 0.5;
+      const WIPE_COLORS = ["#2458be", "#c63d24", "oklch(0.84 0.09 165)", "#077d62", "#c63d24", "oklch(0.19 0.025 255)"];
+
+      // ── Easing ───────────────────────────────────────────────────────────────
+      const clamp = (v, a = 0, b = 1) => Math.min(b, Math.max(a, v));
+      const seg = (t, a, d) => clamp((t - a) / d);
+      const outExpo = (p) => (p >= 1 ? 1 : 1 - Math.pow(2, -10 * p));
+      const outCubic = (p) => 1 - Math.pow(1 - p, 3);
+      const inOutCubic = (p) => (p < 0.5 ? 4 * p * p * p : 1 - Math.pow(-2 * p + 2, 3) / 2);
+      const outBack = (p) => { const c = 1.70158; return 1 + (c + 1) * Math.pow(p - 1, 3) + c * Math.pow(p - 1, 2); };
+      // CSS `ease`, so strokes move exactly as the library's own transition would.
+      function cubicBezier(x1, y1, x2, y2) {
+        const bx = (u) => 3 * (1 - u) * (1 - u) * u * x1 + 3 * (1 - u) * u * u * x2 + u * u * u;
+        const by = (u) => 3 * (1 - u) * (1 - u) * u * y1 + 3 * (1 - u) * u * u * y2 + u * u * u;
+        return (x) => {
+          if (x <= 0) return 0;
+          if (x >= 1) return 1;
+          let lo = 0, hi = 1, u = x;
+          for (let i = 0; i < 24; i++) {
+            u = (lo + hi) / 2;
+            if (bx(u) < x) lo = u; else hi = u;
+          }
+          return by(u);
+        };
+      }
+      const cssEase = cubicBezier(0.25, 0.1, 0.25, 1);
+
+      // ── Stroke clock ─────────────────────────────────────────────────────────
+      // The library bakes each stroke's delay and duration into an inline transition. Instead of letting
+      // the browser run it in real time, read those numbers and set the dashoffset for any moment, so
+      // every frame renders exactly — no dropped frames, same output every run.
+      const strokes = [];
+      const events = [];
+      function mount(root, t0, kind = "pen") {
+        for (const el of root.querySelectorAll(".hw-stroke")) {
+          const m = /stroke-dashoffset (\d+)ms ease (\d+)ms/.exec(el.getAttribute("style") || "");
+          if (!m) continue;
+          el.style.transition = "none";
+          strokes.push({ el, start: t0 + Number(m[2]) / 1000, dur: Number(m[1]) / 1000, kind, last: -1, logged: false });
+        }
+      }
+
+      function drawStrokes(t) {
+        for (const s of strokes) {
+          const p = (t - s.start) / s.dur;
+          const v = p <= 0 ? 0 : p >= 1 ? 1 : cssEase(p);
+          const key = p <= 0 ? -1 : v;
+          if (key === s.last) continue;
+          s.last = key;
+          s.el.style.visibility = p <= 0 ? "hidden" : "visible";
+          s.el.style.strokeDashoffset = String(1 - v);
+          if (p > 0 && !s.logged) {
+            s.logged = true;
+            const r = s.el.getBoundingClientRect();
+            events.push({ type: s.kind, t: s.start, dur: s.dur, x: (r.left + r.width / 2) / 1920 });
+          }
+        }
+      }
+
+      // ── Tweens ───────────────────────────────────────────────────────────────
+      const tweens = [];
+      const tween = (el, t0, dur, apply, ease = outExpo) => tweens.push({ el, t0, dur, apply, ease });
+      const rise = (el, t0, dur = 0.9, dist = 40) =>
+        tween(el, t0, dur, (e, p) => {
+          e.style.opacity = String(p);
+          e.style.transform = `translateY(${(1 - p) * dist}px)`;
+        });
+      function words(el, t0, stagger = 0.06, dur = 0.9) {
+        const lines = el.innerHTML.split(/<br\s*\/?>/).map((line) => line.replace(/<[^>]+>/g, "").trim().split(/\s+/));
+        el.innerHTML = lines
+          .map((line) => line.map((w) => `<span class="w"><span>${w}</span></span>`).join(" "))
+          .join("<br />");
+        el.querySelectorAll(".w > span").forEach((span, i) =>
+          tween(span, t0 + i * stagger, dur, (e, p) => {
+            e.style.transform = `translateY(${(1 - p) * 110}%)`;
+          }),
+        );
+      }
+      function typeCode(el, t0, cps, parts) {
+        const total = parts.reduce((n, [text]) => n + text.length, 0);
+        tween(el, t0, total / cps, (e, p) => {
+          let left = Math.round(p * total);
+          let html = "";
+          for (const [text, cls] of parts) {
+            if (left <= 0) break;
+            const chunk = text.slice(0, left);
+            left -= chunk.length;
+            html += cls ? `<span class="${cls}">${esc(chunk)}</span>` : esc(chunk);
+          }
+          e.innerHTML = html + `<span class="caret"></span>`;
+        }, (p) => p);
+      }
+      const esc = (s) => s.replace(/&/g, "&amp;").replace(/</g, "&lt;");
+
+      // ── Chrome: crop marks + progress rule ───────────────────────────────────
+      const chrome = document.getElementById("chrome");
+      const cropMarks = [
+        [60, 40, 60, 80], [40, 60, 80, 60], [1860, 40, 1860, 80], [1840, 60, 1880, 60],
+        [60, 1000, 60, 1040], [40, 1020, 80, 1020], [1860, 1000, 1860, 1040], [1840, 1020, 1880, 1020],
+      ];
+      let seed = 11;
+      const rnd = () => ((seed = (seed * 16807) % 2147483647) / 2147483647);
+      chrome.innerHTML =
+        cropMarks
+          .map(([a, b, c, d], i) =>
+            `<path class="hw-stroke" d="${sketch(shapes.line(a, b, c, d), rnd, { roughness: 1.2 })}" stroke="var(--ink)" stroke-width="2.4" fill="none" stroke-linecap="round" pathLength="1" style="stroke-dasharray:1;stroke-dashoffset:1;visibility:hidden;transition:stroke-dashoffset 380ms ease ${150 + i * 55}ms" />`,
+          )
+          .join("") +
+        `<path id="progress" d="${sketch(shapes.line(150, 1036, 1770, 1036), rnd, { roughness: 1.4 })}" stroke="var(--vermilion)" stroke-width="3" fill="none" stroke-linecap="round" pathLength="1" style="stroke-dasharray:1;stroke-dashoffset:1" />`;
+      mount(chrome, 0, "soft");
+      const progress = document.getElementById("progress");
+
+      // ── Wipes: one huge marker stroke drawn across the frame, then pulled off the far side ──
+      const wipe = document.getElementById("wipe");
+      const wipeSeeds = SCENES.slice(1).map((s, i) => {
+        seed = 101 + i * 7;
+        const up = i % 2 === 0;
+        const d = sketch(shapes.curve([[-900, up ? 760 : 320], [960, 540 + (up ? -30 : 30)], [2820, up ? 320 : 760]]), rnd, { roughness: 12 });
+        const el = document.createElementNS("http://www.w3.org/2000/svg", "path");
+        el.setAttribute("d", d);
+        el.setAttribute("stroke", WIPE_COLORS[i % WIPE_COLORS.length]);
+        el.setAttribute("stroke-width", "1700");
+        el.setAttribute("fill", "none");
+        el.setAttribute("stroke-linecap", "round");
+        el.setAttribute("pathLength", "1");
+        el.style.strokeDasharray = "1";
+        el.style.visibility = "hidden";
+        wipe.append(el);
+        events.push({ type: "whoosh", t: s.from - WIPE, dur: WIPE * 2, x: 0.5, dir: 1 });
+        return { el, at: s.from };
+      });
+
+      function drawWipes(t) {
+        for (const w of wipeSeeds) {
+          const a = w.at - WIPE;
+          const b = w.at + WIPE;
+          if (t < a || t > b) {
+            w.el.style.visibility = "hidden";
+            continue;
+          }
+          w.el.style.visibility = "visible";
+          w.el.style.strokeDashoffset =
+            t < w.at ? String(1 - inOutCubic(seg(t, a, WIPE))) : String(-inOutCubic(seg(t, w.at, WIPE)));
+        }
+      }
+
+      // ── Scene 0: intro ───────────────────────────────────────────────────────
+      const at = (id) => SCENES.find((s) => s.id === id).from;
+      {
+        const t0 = at("s-intro");
+        const logo = document.getElementById("intro-logo");
+        logo.innerHTML = renderText("glyphed.js", { copyable: false });
+        mount(logo, t0 + 0.55);
+        const ul = document.createElement("span");
+        ul.style.cssText = "position:absolute;left:0;top:0";
+        logo.append(ul);
+        // Measured in the logo's own (pre-zoom) units, straight from the word svg: 24 tall, N wide.
+        const logoWidth = Number(logo.querySelector("svg.hw-word").getAttribute("width"));
+        ul.innerHTML = renderAnnotation(logoWidth, 22, { type: "underline", color: "#c63d24", strokeWidth: 1.6, padding: 2, seed: 4, duration: 520 });
+        mount(ul, t0 + 1.75, "soft");
+        const tag = document.getElementById("intro-tag");
+        rise(tag, t0 + 2.2, 1.1, 30);
+        tag.style.opacity = "0";
+        const logoWrap = logo.parentElement;
+        tween(logoWrap, t0 + 0.2, 4.8, (e, p) => (e.style.transform = `scale(${1 + 0.04 * p})`), (p) => p);
+      }
+
+      // ── Scene 1: handwriting ─────────────────────────────────────────────────
+      {
+        const t0 = at("s-text");
+        const hand = document.getElementById("text-hand");
+        hand.innerHTML = renderText("Give your interface\na human hand.", { copyable: false });
+        mount(hand, t0 + 0.35);
+        const v = document.getElementById("text-variants");
+        ["#c63d24", "#2458be", "#077d62"].forEach((c, i) => {
+          const el = document.createElement("div");
+          el.className = "v";
+          el.style.setProperty("--hw-color", c);
+          el.innerHTML = renderText("Human", { copyable: false });
+          v.append(el);
+          mount(el, t0 + 3.6 + i * 0.45);
+        });
+        const label = document.getElementById("variants-label");
+        label.style.opacity = "0";
+        rise(label, t0 + 4.9, 0.8, 16);
+        words(document.getElementById("text-head"), t0 + 0.5);
+        const sub = document.getElementById("text-sub");
+        sub.style.opacity = "0";
+        rise(sub, t0 + 1.0, 0.9, 20);
+        typeCode(document.getElementById("text-code"), t0 + 1.5, 34, [
+          ["import", "k"], [" { ", "p"], ["write", "f"], [" } ", "p"], ["from", "k"], [' "glyphed.js"', "s"], [";\n\n", "p"],
+          ["write", "f"], ["(", "p"], ['"#hero"', "s"], [", ", "p"], ['"a human hand."', "s"], [");", "p"],
+        ]);
+      }
+
+      // ── Scene 2: icons ───────────────────────────────────────────────────────
+      {
+        const t0 = at("s-icons");
+        words(document.getElementById("icons-head"), t0 + 0.3);
+        const names = [
+          "heart", "star", "rocket", "sparkle", "bulb", "coffee", "sun", "moon", "cloud", "bolt", "flame", "leaf",
+          "home", "search", "mail", "bell", "calendar", "clock", "camera", "music", "globe", "pin", "gift", "smile",
+          "code", "terminal", "edit", "trash", "lock", "eye", "link", "send", "check", "flag", "bookmark", "message",
+          "arrow-right", "refresh", "download", "upload", "trending-up", "bar-chart", "pie-chart", "activity", "cart", "folder", "image", "sliders",
+        ];
+        const grid = document.getElementById("icon-grid");
+        names.forEach((name, i) => {
+          const col = i % 12;
+          const row = Math.floor(i / 12);
+          const cell = document.createElement("div");
+          const color = (col + row) % 7 === 3 ? "#c63d24" : (col * 3 + row) % 11 === 5 ? "#2458be" : undefined;
+          cell.innerHTML = renderIcon(icons[name], { size: 88, seed: i + 3, color });
+          grid.append(cell);
+          mount(cell, t0 + 0.9 + (col + row * 1.6) * 0.07, "icon");
+        });
+        const backdrop = grid.parentElement;
+        tween(backdrop, t0 + 4.3, 0.9, (e, p) => {
+          e.style.opacity = String(1 - 0.86 * p);
+          e.style.filter = `blur(${p * 3}px)`;
+          e.style.transform = `scale(${1 - 0.04 * p})`;
+        }, inOutCubic);
+        const sc = document.getElementById("sc-hand");
+        sc.innerHTML = renderText("Ship it :rocket: with :heart:", { icons, copyable: false });
+        mount(sc, t0 + 4.8);
+        const chip = document.getElementById("sc-chip");
+        chip.style.opacity = "0";
+        rise(chip, t0 + 6.0, 0.8, 20);
+      }
+
+      // ── Scene 3: annotations ─────────────────────────────────────────────────
+      const annotationJobs = [];
+      {
+        const t0 = at("s-marks");
+        words(document.getElementById("marks-head"), t0 + 0.3);
+        const text = document.getElementById("marks-text");
+        text.style.opacity = "0";
+        rise(text, t0 + 0.7, 1, 30);
+        const marks = [...text.querySelectorAll("[data-mark]")];
+        marks.forEach((el, i) => annotationJobs.push({ el, type: el.dataset.mark, t: t0 + 1.8 + i * 0.85, seed: 20 + i }));
+        const list = document.getElementById("mark-list");
+        ["underline", "circle", "highlight", "strike", "box", "cross", "bracket"].forEach((n, i) => {
+          const c = document.createElement("span");
+          c.className = "chip";
+          c.textContent = `type: "${n}"`;
+          c.style.opacity = "0";
+          list.append(c);
+          rise(c, t0 + 1.8 + i * 0.6, 0.7, 16);
+        });
+      }
+
+      // ── Scene 4: charts ──────────────────────────────────────────────────────
+      {
+        const t0 = at("s-charts");
+        words(document.getElementById("charts-head"), t0 + 0.3);
+        const size = { width: 360, height: 230 };
+        const bar = document.getElementById("chart-bar");
+        bar.innerHTML = renderChart({ type: "bar", color: "#2458be", seed: 5, ...size, data: [
+          { label: "Mon", value: 12 }, { label: "Tue", value: 19 }, { label: "Wed", value: 7 }, { label: "Thu", value: 15 }, { label: "Fri", value: 22 },
+        ] });
+        mount(bar, t0 + 0.9, "chart");
+        const line = document.getElementById("chart-line");
+        line.innerHTML = renderChart({ type: "line", color: "#c63d24", seed: 6, ...size, data: [
+          { label: "Jan", value: 20 }, { label: "Feb", value: 34 }, { label: "Mar", value: 28 }, { label: "Apr", value: 46 }, { label: "May", value: 41 }, { label: "Jun", value: 63 },
+        ] });
+        mount(line, t0 + 1.9, "chart");
+        const donut = document.getElementById("chart-donut");
+        donut.innerHTML = renderChart({ type: "donut", seed: 7, ...size, data: [
+          { label: "Design", value: 35 }, { label: "Code", value: 40 }, { label: "Docs", value: 15 }, { label: "Coffee", value: 10 },
+        ] });
+        mount(donut, t0 + 2.9, "chart");
+        document.querySelectorAll("#s-charts .card").forEach((card, i) => {
+          card.style.opacity = "0";
+          rise(card, t0 + 0.5 + i * 0.25, 1, 40);
+        });
+        const sl = document.getElementById("spark-line");
+        sl.style.opacity = "0";
+        rise(sl, t0 + 5.0, 0.8, 20);
+        const spark = document.getElementById("spark");
+        spark.innerHTML = renderSparkline([3, 5, 4, 8, 7, 11, 16], { width: 80, color: "#077d62", seed: 3 });
+        mount(spark, t0 + 5.4, "chart");
+      }
+
+      // ── Scene 5: copy ────────────────────────────────────────────────────────
+      const copyScene = { t0: at("s-copy") };
+      {
+        const t0 = copyScene.t0;
+        words(document.getElementById("copy-head"), t0 + 0.3);
+        const hand = document.getElementById("copy-hand");
+        hand.innerHTML = renderText("Select it. Copy it.");
+        mount(hand, t0 + 0.6);
+        const cursor = document.getElementById("cursor");
+        cursor.innerHTML = `<path d="M5 3 L5 19 L9.5 15 L12.5 21 L15 20 L12 14 L18 14 Z" fill="var(--ink)" stroke="var(--paper)" stroke-width="1.4" stroke-linejoin="round" />`;
+        const toastIcon = document.getElementById("toast-icon");
+        toastIcon.innerHTML = renderIcon(icons.check, { size: 34, seed: 9, color: "oklch(0.84 0.09 165)", strokeWidth: 2.6 });
+        mount(toastIcon, t0 + 3.75, "soft");
+        const toast = document.getElementById("toast");
+        tween(toast, t0 + 3.55, 0.7, (e, p) => {
+          e.style.opacity = String(p);
+          e.style.transform = `translateY(${(1 - p) * 24}px) scale(${0.96 + 0.04 * p})`;
+        }, outBack);
+        const notes = document.getElementById("copy-notes");
+        notes.style.opacity = "0";
+        rise(notes, t0 + 4.2, 0.8, 16);
+      }
+
+      // ── Scene 6: outro ───────────────────────────────────────────────────────
+      {
+        const t0 = at("s-outro");
+        const logo = document.getElementById("outro-logo");
+        logo.innerHTML = renderText("glyphed.js", { copyable: false });
+        logo.style.setProperty("--hw-color", "#c63d24");
+        mount(logo, t0 + 0.4);
+        const install = document.getElementById("install");
+        install.style.opacity = "0";
+        rise(install, t0 + 1.6, 0.8, 24);
+        typeCode(document.getElementById("install-text"), t0 + 1.9, 30, [["npm install glyphed.js", ""]]);
+        const features = document.getElementById("features");
+        ["Zero dependencies", "SSR-safe strings", "TypeScript", "68 icons"].forEach((label, i) => {
+          const f = document.createElement("span");
+          f.className = "f";
+          f.innerHTML = renderIcon(icons.check, { size: 36, seed: 30 + i, strokeWidth: 2.6 }) + `<span>${label}</span>`;
+          f.style.opacity = "0";
+          features.append(f);
+          rise(f, t0 + 2.9 + i * 0.22, 0.7, 16);
+          mount(f, t0 + 3.0 + i * 0.22, "soft");
+        });
+        const url = document.getElementById("url");
+        url.style.opacity = "0";
+        rise(url, t0 + 4.1, 0.8, 12);
+      }
+
+      // Annotations need real layout (fonts loaded, scene visible) to measure their targets.
+      async function mountAnnotations() {
+        const scene = document.getElementById("s-marks");
+        scene.style.display = "block";
+        const text = document.getElementById("marks-text");
+        const prev = text.style.transform;
+        text.style.transform = "none";
+        for (const job of annotationJobs) {
+          if (job.type === "highlight") job.el.style.isolation = "isolate";
+          const host = document.createElement("span");
+          host.style.cssText = "position:absolute;left:0;top:0;width:0;height:0;pointer-events:none";
+          host.innerHTML = renderAnnotation(job.el.offsetWidth, job.el.offsetHeight, {
+            type: job.type,
+            seed: job.seed,
+            strokeWidth: job.type === "highlight" ? undefined : 4.5,
+            padding: job.type === "highlight" ? -6 : 8,
+            color: job.type === "highlight" ? "#ffd54a" : "#c63d24",
+            duration: 560,
+          });
+          job.el.append(host);
+          mount(host, job.t, "marker");
+        }
+        text.style.transform = prev;
+        scene.style.display = "none";
+      }
+
+      // ── Copy scene: selection + cursor, driven by the clock ──────────────────
+      function drawCopy(t) {
+        const { t0 } = copyScene;
+        const cursor = document.getElementById("cursor");
+        const layers = [...document.querySelectorAll("#copy-hand .hw-copy")];
+        const sel = getSelection();
+        if (t < t0 || t > t0 + 6) return;
+        const hand = document.getElementById("copy-hand");
+        const first = layers[0]?.getBoundingClientRect();
+        const lastRect = layers[layers.length - 1]?.getBoundingClientRect();
+        if (!first || !lastRect) return;
+        const move = seg(t, t0 + 1.9, 0.6);
+        const drag = seg(t, t0 + 2.55, 0.95);
+        const startX = first.left * 1 - 8, y = first.bottom + 6;
+        const endX = lastRect.right + 4;
+        const x = drag > 0 ? startX + (endX - startX) * inOutCubic(drag) : 1500 + (startX - 1500) * outCubic(move);
+        const yy = drag > 0 ? y : 980 + (y - 980) * outCubic(move);
+        cursor.style.opacity = String(clamp(seg(t, t0 + 1.8, 0.25) - seg(t, t0 + 4.6, 0.3)));
+        cursor.style.left = `${x}px`;
+        cursor.style.top = `${yy - 6}px`;
+        if (drag <= 0) {
+          sel.removeAllRanges();
+          return;
+        }
+        // Extend the real selection word by word as the cursor passes each copy layer.
+        let lastIdx = -1;
+        layers.forEach((l, i) => {
+          const r = l.getBoundingClientRect();
+          if (r.left + r.width * 0.5 <= x) lastIdx = i;
+        });
+        if (lastIdx < 0) {
+          sel.removeAllRanges();
+          return;
+        }
+        const end = layers[lastIdx];
+        sel.setBaseAndExtent(layers[0].firstChild, 0, end.firstChild, end.firstChild.length);
+      }
+
+      // ── Master seek ──────────────────────────────────────────────────────────
+      let hudState = "";
+      function seek(t) {
+        const scene = SCENES.find((s) => t >= s.from && t < s.to) ?? SCENES[SCENES.length - 1];
+        for (const s of SCENES) {
+          const el = document.getElementById(s.id);
+          const on = s === scene;
+          el.style.display = on ? "block" : "none";
+          if (on) {
+            const local = (t - s.from) / (s.to - s.from);
+            el.style.transform = `scale(${1 + 0.018 * local})`;
+          }
+        }
+        if (hudState !== scene.hud) {
+          hudState = scene.hud;
+          document.getElementById("hud-right").textContent = scene.hud || "v1.1";
+        }
+        for (const tw of tweens) {
+          const p = tw.ease(seg(t, tw.t0, tw.dur));
+          if (tw.lastP === p) continue;
+          tw.lastP = p;
+          tw.apply(tw.el, p);
+        }
+        drawStrokes(t);
+        drawWipes(t);
+        progress.style.strokeDashoffset = String(1 - clamp(t / TOTAL));
+        drawCopy(t);
+        // Let the end card settle, then clear back to bare paper so the video loops cleanly.
+        document.getElementById("s-outro").style.opacity = String(1 - seg(t, TOTAL - 0.8, 0.8));
+      }
+
+      // Hidden scenes never trigger their fonts, so load every face up front before measuring anything.
+      await Promise.all([...document.fonts].map((f) => f.load()));
+      await document.fonts.ready;
+      await mountAnnotations();
+      // Initialise every tween at its starting value so nothing flashes before it's due.
+      for (const tw of tweens) tw.apply(tw.el, tw.ease(0));
+      seek(0);
+      window.__seek = seek;
+      window.__meta = { total: TOTAL, scenes: SCENES.map((s) => ({ id: s.id, from: s.from })) };
+      window.__events = events;
+      window.__ready = true;
+
+      // Preview mode (open the file directly): play in real time.
+      if (!new URLSearchParams(location.search).has("render")) {
+        const startAt = performance.now();
+        const q = Number(new URLSearchParams(location.search).get("t") || 0);
+        const loop = () => {
+          const t = q + (performance.now() - startAt) / 1000;
+          seek(t % TOTAL);
+          requestAnimationFrame(loop);
+        };
+        requestAnimationFrame(loop);
+      }
+    </script>
+  </body>
+</html>

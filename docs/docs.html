@@ -99,6 +99,14 @@ write("#hello", "Hello, world!");</code></pre>
             <code>once: false</code> when your own render cycle should
             re-trigger an observer.
           </p>
+          <p>
+            Handwriting is copyable by default: invisible real text sits over
+            each word, so selecting and copying works like normal text. Pass
+            <code>copyable: false</code> for decorative output. Undrawn strokes
+            stay hidden until the pen reaches them; pass
+            <code>dots: true</code> to show each stroke's starting dot ahead of
+            time.
+          </p>
         </section>
 
         <section id="icons">

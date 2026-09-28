@@ -154,17 +154,17 @@ h2 {
   margin-bottom: 18px;
   font-size: clamp(2.2rem, 4.4vw, 4.1rem);
 }
-.handwritten-heading .hw-sentence {
-  display: flex;
-  flex-wrap: wrap;
-  align-items: center;
-  gap: 0;
-}
+/* Words stay inline (not flex items) so selecting and copying a heading gives clean text. */
 .handwritten-heading .hw-word {
-  display: block;
   width: auto;
   max-width: 100%;
   height: 1em;
+  vertical-align: middle;
+}
+.handwritten-heading .hw-copy {
+  /* The copy layer is sized for 24px words; site.js sets the zoom that matches the 1em-tall svgs. */
+  zoom: var(--copy-zoom, 1);
+  vertical-align: middle;
 }
 .hero-summary,
 .section-intro > p:not(.eyebrow),

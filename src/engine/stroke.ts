@@ -61,6 +61,11 @@ export interface StrokeOptions {
   linecap?: "round" | "butt" | "square";
   /** Extra classes after `hw-stroke`. */
   className?: string;
+  /**
+   * Leave the round-cap dot visible on a stroke that hasn't drawn yet (default false). When false,
+   * an animated stroke is `visibility:hidden` until its delay starts, so the pen never shows ahead.
+   */
+  dots?: boolean;
 }
 
 /** The one place a drawn stroke's markup is built: letters, icons, annotations and charts all go through here. */
@@ -76,10 +81,19 @@ export function strokePath(options: StrokeOptions): string {
     opacity,
     linecap = "round",
     className,
+    dots = false,
   } = options;
-  const style = animate
-    ? `stroke-dasharray:1;stroke-dashoffset:1;transition:stroke-dashoffset ${Math.round(duration)}ms ease ${Math.round(delay)}ms;`
-    : "";
+  const ms = Math.round(duration);
+  const wait = Math.round(delay);
+  // A zero-length dash still gets its round cap painted, which shows as a dot at every undrawn
+  // stroke's start. Unless dots are wanted, keep the stroke hidden and flip it visible (a 0s
+  // transition) at the same moment its dashoffset transition begins.
+  const style = !animate
+    ? ""
+    : dots
+      ? `stroke-dasharray:1;stroke-dashoffset:1;transition:stroke-dashoffset ${ms}ms ease ${wait}ms;`
+      : `stroke-dasharray:1;stroke-dashoffset:1;visibility:hidden;` +
+        `transition:stroke-dashoffset ${ms}ms ease ${wait}ms,visibility 0s linear ${wait}ms;`;
   const cls = className ? `${STROKE_CLASS} ${className}` : STROKE_CLASS;
 
   return (

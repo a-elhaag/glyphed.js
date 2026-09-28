@@ -24,11 +24,22 @@ for (const wordmark of document.querySelectorAll(".wordmark")) {
   renderAnimated(wordmark, "glyphed.js", "#171b2e", !reduceMotion);
 }
 
-for (const heading of document.querySelectorAll(".handwritten-heading")) {
+const headings = document.querySelectorAll(".handwritten-heading");
+for (const heading of headings) {
   const text = heading.textContent.trim();
   heading.setAttribute("aria-label", text);
   renderAnimated(heading, text, "#171b2e", true);
 }
+
+// Heading words are drawn 1em tall; scale the invisible copy text to match so selection lines up.
+function fitCopyLayers() {
+  for (const heading of headings) {
+    const size = parseFloat(getComputedStyle(heading).fontSize);
+    heading.style.setProperty("--copy-zoom", String(size / 24));
+  }
+}
+fitCopyLayers();
+window.addEventListener("resize", fitCopyLayers);
 
 const preview = document.querySelector("#writing-preview");
 const input = document.querySelector("#writing-input");

@@ -1,0 +1,51 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  build:
+    name: Typecheck & build
+    runs-on: ubuntu-latest
+    env:
+      # Playwright is only used for local screenshots; CI never needs its browsers.
+      PLAYWRIGHT_SKIP_BROWSER_DOWNLOAD: "1"
+    steps:
+      - uses: actions/checkout@v7
+
+      - uses: actions/setup-node@v7
+        with:
+          node-version: 24
+          cache: npm
+
+      - run: npm ci
+
+      - name: Typecheck
+        run: npm run typecheck
+
+      - name: Build
+        run: npm run build
+
+      - name: Smoke test the built package
+        run: |
+          node --input-type=module -e '
+            import { renderText, renderIcon, renderChart } from "./dist/index.js";
+            import { icons } from "./dist/icons/index.js";
+            const text = renderText("Hi :rocket:", { icons });
+            if (!text.includes("hw-word") || !text.includes("hw-inline-icon")) throw new Error("renderText output is wrong");
+            if (!renderIcon(icons.heart).includes("hw-icon")) throw new Error("renderIcon output is wrong");
+            if (renderChart({ type: "bar", data: [{ label: "a", value: 1 }] }).includes("NaN")) throw new Error("renderChart produced NaN");
+            console.log("smoke test passed:", Object.keys(icons).length, "icons");
+          '
+
+      - name: Check package contents
+        run: npm pack --dry-run

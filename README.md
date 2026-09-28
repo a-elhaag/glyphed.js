@@ -345,7 +345,7 @@ Open it with any static file server, e.g. `npx serve .` then visit `/demo/`.
 
 ## Showcase video
 
-`docs/social/glyphed-js-showcase.mp4` is a 49-second, 1080p60 tour of the library: handwriting, icons, annotations, charts, and copyable text, with a soundtrack scored from the drawing itself.
+`docs/social/glyphed-js-showcase.mp4` is a 52-second, 1080p60 tour of the library: handwriting, icons, annotations, charts, and copyable text, cut to a 120 BPM track synthesised from the same timeline, so every pop and bounce lands on the beat.
 
 It's rendered from `docs/social/showcase/showcase.html`, which uses the built package. Open that file directly to preview it in real time (add `?t=12` to start 12 seconds in). To render the video:
 

@@ -30,7 +30,7 @@ function drawIcons() {
     .filter((name) => icons[name])
     .map(
       (name, i) =>
-        `<div class="icon-cell">${renderIcon(icons[name], { size: 44, animate, delay: (i % 8) * 80, label: name })}<code>${name}</code></div>`,
+        `<div class="icon-cell">${renderIcon(icons[name], { size: 44, animate, delay: (i % 8) * 80, label: name, hover: true })}<code>${name}</code></div>`,
     )
     .join("");
   if (animate) attach(grid);

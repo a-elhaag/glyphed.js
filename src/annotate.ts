@@ -150,11 +150,39 @@ export function annotate(target: HTMLElement | string, options: AnnotateOptions)
   el.append(host);
 
   const draw = (animate: boolean) => {
-    host.innerHTML = renderAnnotation(el.offsetWidth, el.offsetHeight, { ...options, animate });
+    // An inline element that wraps has one box per line; mark each line, not the whole bounding box.
+    const rects = [...el.getClientRects()];
+    if (rects.length < 2) {
+      host.innerHTML = renderAnnotation(el.offsetWidth, el.offsetHeight, { ...options, animate });
+      return;
+    }
+    const origin = host.getBoundingClientRect();
+    const perLine = Math.min(options.duration ?? 600, 600);
+    host.innerHTML = rects
+      .map(
+        (r, i) =>
+          `<span style="position:absolute;left:${fmt(r.left - origin.left)}px;top:${fmt(r.top - origin.top)}px">` +
+          renderAnnotation(r.width, r.height, { ...options, animate, delay: (options.delay ?? 0) + i * perLine }) +
+          `</span>`,
+      )
+      .join("");
   };
 
   draw(options.animate !== false);
   if (options.animate !== false) attach(host, options);
+
+  // Text reflows (resize, late web fonts); re-measure so the mark stays on its words. Inline elements
+  // don't report resizes themselves, so watch the block they sit in.
+  let size = "";
+  const reflow = () => {
+    const next = [...el.getClientRects()].map((r) => `${r.left - el.getBoundingClientRect().left},${r.width},${r.height}`).join();
+    // Not drawn in yet: keep it hidden for the observer. Already on screen: redraw in place.
+    if (size && next !== size && host.isConnected) draw(options.animate !== false && !host.querySelector(".hw-visible"));
+    size = next;
+  };
+  const resize = typeof ResizeObserver === "undefined" ? undefined : new ResizeObserver(reflow);
+  resize?.observe(el.parentElement ?? el);
+  document.fonts?.ready.then(reflow);
 
   return {
     redraw() {
@@ -164,6 +192,7 @@ export function annotate(target: HTMLElement | string, options: AnnotateOptions)
       for (const svg of host.querySelectorAll(`.${DRAW_CLASS}`)) animateWriting(svg);
     },
     remove() {
+      resize?.disconnect();
       host.remove();
     },
   };

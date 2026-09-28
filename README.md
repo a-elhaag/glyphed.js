@@ -208,6 +208,7 @@ Starts the draw-in transition immediately on a rendered `.hw-word` element (or a
 | `delay`       | `number`  | `0`                       | ms before the first stroke.                                   |
 | `label`       | `string`  | —                         | Accessible name; without it the icon is `aria-hidden`.        |
 | `dots`        | `boolean` | `false`                   | Show each stroke's start dot before it draws.                 |
+| `hover`       | `boolean` | `false`                   | Icon moves while hovered (bell rings, sun spins, heart beats). |
 
 `drawIcon` also takes the `AttachOptions`.
 

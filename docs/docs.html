@@ -120,7 +120,12 @@ write("#hello", "Hello, world!");</code></pre>
           <div class="icon-reference" aria-label="Icon reference">
             <div class="reference-toolbar">
               <label for="icon-search">Find an icon</label>
-              <input id="icon-search" type="search" placeholder="Search rocket, arrow, chart..." autocomplete="off" />
+              <input
+                id="icon-search"
+                type="search"
+                placeholder="Search rocket, arrow, chart..."
+                autocomplete="off"
+              />
               <p id="icon-count" aria-live="polite"></p>
             </div>
             <div class="docs-icon-grid" id="docs-icon-grid"></div>
@@ -144,7 +149,8 @@ const markup = renderText("Ship it :rocket: with :heart:", {
                 SVG string. Options: <code>size</code>, <code>color</code>,
                 <code>strokeWidth</code>, <code>roughness</code>,
                 <code>seed</code>, <code>delay</code>, <code>label</code>,
-                <code>animate</code>, <code>hover</code> (a small motion of its own while hovered).
+                <code>animate</code>, <code>hover</code> (a small motion of its
+                own while hovered).
               </dd>
             </div>
             <div>
@@ -170,13 +176,47 @@ const markup = renderText("Ship it :rocket: with :heart:", {
           </p>
           <div class="chart-reference">
             <div class="chart-picker" role="tablist" aria-label="Chart type">
-              <button type="button" role="tab" aria-selected="true" data-chart-type="bar">Bar</button>
-              <button type="button" role="tab" aria-selected="false" data-chart-type="line">Line</button>
-              <button type="button" role="tab" aria-selected="false" data-chart-type="pie">Pie</button>
-              <button type="button" role="tab" aria-selected="false" data-chart-type="donut">Donut</button>
+              <button
+                type="button"
+                role="tab"
+                aria-selected="true"
+                data-chart-type="bar"
+              >
+                Bar
+              </button>
+              <button
+                type="button"
+                role="tab"
+                aria-selected="false"
+                data-chart-type="line"
+              >
+                Line
+              </button>
+              <button
+                type="button"
+                role="tab"
+                aria-selected="false"
+                data-chart-type="pie"
+              >
+                Pie
+              </button>
+              <button
+                type="button"
+                role="tab"
+                aria-selected="false"
+                data-chart-type="donut"
+              >
+                Donut
+              </button>
             </div>
-            <div class="chart-preview" id="chart-preview" aria-live="polite"></div>
-            <pre class="reference-code"><code id="chart-code"></code><button class="copy-button" id="copy-chart-code" type="button">Copy</button></pre>
+            <div
+              class="chart-preview"
+              id="chart-preview"
+              aria-live="polite"
+            ></div>
+            <pre
+              class="reference-code"
+            ><code id="chart-code"></code><button class="copy-button" id="copy-chart-code" type="button">Copy</button></pre>
           </div>
           <dl class="api-list">
             <div>
@@ -188,7 +228,10 @@ const markup = renderText("Ship it :rocket: with :heart:", {
               </dd>
             </div>
             <div>
-              <dt><code>renderChart(options)</code> / <code>drawChart(target, options)</code></dt>
+              <dt>
+                <code>renderChart(options)</code> /
+                <code>drawChart(target, options)</code>
+              </dt>
               <dd>
                 <code>bar</code>, <code>line</code>, <code>pie</code>,
                 <code>donut</code> with hatched fills and handwritten labels.
@@ -213,9 +256,9 @@ const markup = renderText("Ship it :rocket: with :heart:", {
         <section id="marks">
           <h2 class="handwritten-heading">Annotations</h2>
           <p>
-            Add a hand-drawn mark to an element after it is in the document.
-            The returned controller lets you redraw after content changes or
-            remove the mark during cleanup.
+            Add a hand-drawn mark to an element after it is in the document. The
+            returned controller lets you redraw after content changes or remove
+            the mark during cleanup.
           </p>
           <pre data-copy><code>import { annotate } from "glyphed.js";
 
@@ -231,9 +274,10 @@ mark.remove();</code></pre>
             <div>
               <dt><code>annotate(target, options)</code></dt>
               <dd>
-                Types: <code>underline</code>, <code>circle</code>, <code>box</code>,
-                <code>highlight</code>, <code>strike</code>, <code>cross</code>,
-                <code>bracket</code>. Returns <code>{ redraw, remove }</code>.
+                Types: <code>underline</code>, <code>circle</code>,
+                <code>box</code>, <code>highlight</code>, <code>strike</code>,
+                <code>cross</code>, <code>bracket</code>. Returns
+                <code>{ redraw, remove }</code>.
               </dd>
             </div>
           </dl>

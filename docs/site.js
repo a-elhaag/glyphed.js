@@ -211,7 +211,9 @@ function renderIconCatalog(query = "") {
   }
 }
 
-iconSearch?.addEventListener("input", () => renderIconCatalog(iconSearch.value));
+iconSearch?.addEventListener("input", () =>
+  renderIconCatalog(iconSearch.value),
+);
 renderIconCatalog();
 
 const chartPreview = document.querySelector("#chart-preview");
@@ -259,7 +261,9 @@ function renderChartExample(type) {
 }
 
 for (const button of chartButtons) {
-  button.addEventListener("click", () => renderChartExample(button.dataset.chartType));
+  button.addEventListener("click", () =>
+    renderChartExample(button.dataset.chartType),
+  );
 }
 
 copyChartCode?.addEventListener("click", async () => {

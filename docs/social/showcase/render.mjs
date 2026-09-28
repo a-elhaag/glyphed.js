@@ -3,10 +3,11 @@
 //   npm run build && node docs/social/showcase/render.mjs
 //
 // Env: FPS (default 60), FROM / TO (seconds, for quick partial drafts), FFMPEG (ffmpeg binary),
-// CHROMIUM (browser executable), OUT (output mp4 path).
+// CHROMIUM (browser executable), OUT (output mp4 path), AUDIO_ONLY=1 (re-score the existing video),
+// VERTICAL=1 (1080×1920 cut for Instagram/TikTok stories; writes glyphed-js-showcase-vertical.mp4).
 import { chromium } from "playwright";
 import { spawn } from "node:child_process";
-import { mkdtempSync, rmSync, writeFileSync } from "node:fs";
+import { mkdtempSync, renameSync, rmSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import path from "node:path";
 import { fileURLToPath, pathToFileURL } from "node:url";
@@ -15,7 +16,9 @@ import { scoreShowcase } from "./audio.mjs";
 const dir = path.dirname(fileURLToPath(import.meta.url));
 const FPS = Number(process.env.FPS || 60);
 const FFMPEG = process.env.FFMPEG || "ffmpeg";
-const OUT = process.env.OUT || path.join(dir, "..", "glyphed-js-showcase.mp4");
+const VERTICAL = Boolean(process.env.VERTICAL);
+const [WIDTH, HEIGHT] = VERTICAL ? [1080, 1920] : [1920, 1080];
+const OUT = process.env.OUT || path.join(dir, "..", VERTICAL ? "glyphed-js-showcase-vertical.mp4" : "glyphed-js-showcase.mp4");
 const POSTER = OUT.replace(/\.mp4$/, "-poster.png");
 const work = mkdtempSync(path.join(tmpdir(), "glyphed-showcase-"));
 
@@ -30,11 +33,29 @@ const browser = await chromium.launch({
   ...(process.env.CHROMIUM ? { executablePath: process.env.CHROMIUM } : {}),
   args: ["--allow-file-access-from-files", "--font-render-hinting=none"],
 });
-const page = await browser.newPage({ viewport: { width: 1920, height: 1080 }, deviceScaleFactor: 1 });
+const page = await browser.newPage({ viewport: { width: WIDTH, height: HEIGHT }, deviceScaleFactor: 1 });
 page.on("pageerror", (e) => console.error("page error:", e.message));
-await page.goto(pathToFileURL(path.join(dir, "showcase.html")).href + "?render");
+await page.goto(pathToFileURL(path.join(dir, "showcase.html")).href + (VERTICAL ? "?render&vertical" : "?render"));
 await page.waitForFunction("window.__ready === true", null, { timeout: 30_000 });
 const meta = await page.evaluate("window.__meta");
+
+// AUDIO_ONLY=1: keep the existing video's picture, re-score it, and remux. For sound-only changes.
+if (process.env.AUDIO_ONLY) {
+  const events = await page.evaluate("window.__events");
+  await browser.close();
+  const wavPath = path.join(work, "score.wav");
+  const tmpOut = path.join(work, "remux.mp4");
+  writeFileSync(wavPath, scoreShowcase({ total: meta.total, events, scenes: meta.scenes }));
+  await run([
+    "-y", "-hide_banner", "-loglevel", "error", "-i", OUT, "-i", wavPath,
+    "-map", "0:v", "-map", "1:a", "-c:v", "copy", "-c:a", "aac", "-b:a", "192k", "-shortest",
+    "-movflags", "+faststart", tmpOut,
+  ]);
+  renameSync(tmpOut, OUT);
+  rmSync(work, { recursive: true, force: true });
+  console.log(`Re-scored ${OUT}`);
+  process.exit(0);
+}
 
 const from = Number(process.env.FROM || 0);
 const to = Math.min(Number(process.env.TO || meta.total), meta.total);
@@ -73,8 +94,8 @@ encoder.stdin.end();
 await encoded;
 process.stdout.write("\n");
 
-// Poster: the icon wall mid-draw reads best as a thumbnail.
-await page.evaluate((t) => window.__seek(t), Number(process.env.POSTER_AT || 16.1));
+// Poster: the icon wall mid-ripple reads best as a thumbnail.
+await page.evaluate((t) => window.__seek(t), Number(process.env.POSTER_AT || 18.3));
 await page.screenshot({ path: POSTER, type: "png" });
 
 const events = await page.evaluate("window.__events");

@@ -1,9 +1,25 @@
 import { glyphs, type GlyphEntry } from "./glyphs/glyphs.js";
+import type { Icon } from "./icons/types.js";
+import { sketch } from "./engine/sketch.js";
+import {
+  DRAW_CLASS,
+  STAGGER_MS,
+  STROKE_CLASS,
+  escapeAttr,
+  jitterTransform,
+  randomJitter,
+  strokePath,
+} from "./engine/stroke.js";
 
 const PUNCTUATION = new Set([".", ",", "!", "?", "'", "-"]);
-const LETTER_HEIGHT = 24;
-const STAGGER_MS = 60;
-const STROKE_MS = 400;
+export const LETTER_HEIGHT = 24;
+
+/** Icons sit inside a line of text a touch taller than cap height: 24-unit grid scaled to ~20 units, 1 unit of side bearing. */
+const INLINE_ICON_SCALE = 0.85;
+const INLINE_ICON_BEARING = 1;
+const INLINE_ICON_ADVANCE = 24 * INLINE_ICON_SCALE + INLINE_ICON_BEARING * 2;
+const ICON_STROKE_STAGGER_MS = 45;
+const SHORTCODE = /^:([a-z0-9-]+):/;
 
 /** Tracks the last variant index picked per character so the same glyph never repeats back-to-back. */
 const lastVariant = new Map<string, number>();
@@ -23,29 +39,45 @@ function splitText(text: string): string[] {
   return text.split(/(\s+)/).filter((part) => part.length > 0);
 }
 
-const JITTER_ROTATE_DEG = 7;
-const JITTER_BASELINE = 1;
-const JITTER_SCALE = 0.1;
-
-/** Small per-instance wobble (rotation, baseline drift, scale) layered on top of the picked variant, so no two renders of the same letter sit identically even when they share a path. */
-function randomJitter(): { rotate: number; dy: number; scale: number } {
-  return {
-    rotate: (Math.random() * 2 - 1) * JITTER_ROTATE_DEG,
-    dy: (Math.random() * 2 - 1) * JITTER_BASELINE,
-    scale: 1 + (Math.random() * 2 - 1) * JITTER_SCALE,
-  };
+export interface LineLayout {
+  /** Stroke <path> markup, positioned from x = 0. */
+  paths: string;
+  width: number;
+  /** Number of marks (letters + icons) laid out; drives the stagger of whatever follows. */
+  count: number;
 }
 
-function renderWord(
-  word: string,
+/**
+ * Lays out a run of characters (spaces included) as positioned stroke paths.
+ * `:name:` shortcodes become inline icons when `icons` has that name.
+ */
+export function layoutLine(
+  text: string,
   delayOffset: number,
   animate: boolean,
-): { svg: string; letterCount: number } {
+  icons?: Record<string, Icon>,
+): LineLayout {
   let x = 0;
   const paths: string[] = [];
-  let letterIndex = 0;
+  let index = 0;
+  const chars = [...text];
 
-  for (const rawChar of word) {
+  for (let i = 0; i < chars.length; i++) {
+    const rawChar = chars[i];
+    const delay = (delayOffset + index) * STAGGER_MS;
+
+    if (rawChar === ":" && icons) {
+      const match = SHORTCODE.exec(chars.slice(i, i + 40).join(""));
+      const icon = match && icons[match[1]];
+      if (icon) {
+        paths.push(inlineIcon(icon, x, delay, animate));
+        x += INLINE_ICON_ADVANCE;
+        index++;
+        i += match[0].length - 1;
+        continue;
+      }
+    }
+
     const char = PUNCTUATION.has(rawChar)
       ? rawChar
       : glyphs[rawChar]
@@ -57,37 +89,55 @@ function renderWord(
     const variantIndex = pickVariant(char, entry);
     const d = entry.variants[variantIndex];
     const width = entry.variantWidths?.[variantIndex] ?? entry.width;
-    const style = animate
-      ? `stroke-dasharray:1;stroke-dashoffset:1;transition:stroke-dashoffset ${STROKE_MS}ms ease ${
-          (delayOffset + letterIndex) * STAGGER_MS
-        }ms;`
-      : "";
 
     if (d) {
-      const { rotate, dy, scale } = randomJitter();
-      const cx = width / 2;
-      const cy = LETTER_HEIGHT / 2;
-      // Position first, then rotate/scale around the letter's own center (not the SVG origin)
-      // so the jitter can't nudge later letters in long words out of position.
-      const transform =
-        `translate(${x} ${dy.toFixed(2)}) translate(${cx} ${cy}) ` +
-        `rotate(${rotate.toFixed(1)}) scale(${scale.toFixed(3)}) translate(${-cx} ${-cy})`;
-
-      paths.push(
-        `<path d="${d}" transform="${transform}" stroke="var(--hw-color, #000)" fill="none" ` +
-          `stroke-width="2" stroke-linecap="round" pathLength="1" style="${style}" class="hw-letter" />`,
-      );
+      const transform = jitterTransform(x, 0, width / 2, LETTER_HEIGHT / 2, randomJitter());
+      paths.push(strokePath({ d, transform, animate, delay, className: "hw-letter" }));
     }
 
     x += width;
-    letterIndex++;
+    index++;
   }
 
-  const svg =
-    `<svg class="hw-word" xmlns="http://www.w3.org/2000/svg" width="${x}" height="${LETTER_HEIGHT}" ` +
-    `viewBox="0 0 ${x} ${LETTER_HEIGHT}" aria-hidden="true">${paths.join("")}</svg>`;
+  return { paths: paths.join(""), width: x, count: index };
+}
 
-  return { svg, letterCount: letterIndex };
+function inlineIcon(icon: Icon, x: number, delay: number, animate: boolean): string {
+  const transform = jitterTransform(
+    x + INLINE_ICON_BEARING,
+    (LETTER_HEIGHT - 24 * INLINE_ICON_SCALE) / 2,
+    12,
+    12,
+    randomJitter(Math.random, 0.5),
+    INLINE_ICON_SCALE,
+  );
+  const strokes = icon.strokes
+    .map((d, i) =>
+      strokePath({
+        d: sketch(d),
+        animate,
+        delay: delay + i * ICON_STROKE_STAGGER_MS,
+        // Compensate for the scale so icon ink matches letter ink.
+        width: 2 / INLINE_ICON_SCALE,
+        className: "hw-icon-stroke",
+      }),
+    )
+    .join("");
+  return `<g transform="${transform}" class="hw-inline-icon">${strokes}</g>`;
+}
+
+function renderWord(
+  word: string,
+  delayOffset: number,
+  animate: boolean,
+  icons?: Record<string, Icon>,
+): { svg: string; letterCount: number } {
+  const { paths, width, count } = layoutLine(word, delayOffset, animate, icons);
+  const svg =
+    `<svg class="hw-word ${DRAW_CLASS}" xmlns="http://www.w3.org/2000/svg" width="${width}" height="${LETTER_HEIGHT}" ` +
+    `viewBox="0 0 ${width} ${LETTER_HEIGHT}" aria-hidden="true">${paths}</svg>`;
+
+  return { svg, letterCount: count };
 }
 
 function renderWhitespace(
@@ -120,6 +170,11 @@ function renderWhitespace(
 export interface RenderTextOptions {
   /** Draw letters in via stroke-dashoffset when the word scrolls into view (default true). Set false for static, fully-drawn output. */
   animate?: boolean;
+  /**
+   * Icons available as `:name:` shortcodes inside the text, e.g. `{ icons }` from `glyphed.js/icons`
+   * or just the ones you use: `{ icons: { rocket, heart } }`. Unknown shortcodes render as plain text.
+   */
+  icons?: Record<string, Icon>;
 }
 
 /**
@@ -131,7 +186,7 @@ export function renderText(
   text: string,
   options: RenderTextOptions = {},
 ): string {
-  const { animate = true } = options;
+  const { animate = true, icons } = options;
   const parts = splitText(text);
   let delayOffset = 0;
   const markup: string[] = [];
@@ -144,7 +199,7 @@ export function renderText(
     }
 
     const word = part;
-    const { svg, letterCount } = renderWord(word, delayOffset, animate);
+    const { svg, letterCount } = renderWord(word, delayOffset, animate, icons);
     const { markup: space, letterCount: spaceCount } = renderWhitespace(
       pendingWhitespace,
       delayOffset,
@@ -168,21 +223,19 @@ export function renderText(
     );
   }
 
-  return `<span class="hw-sentence" aria-label="${escapeAttr(text)}">${markup.join("")}</span>`;
+  const label = icons
+    ? text.replace(/:([a-z0-9-]+):/g, (code, name: string) => (icons[name] ? name : code))
+    : text;
+  return `<span class="hw-sentence" aria-label="${escapeAttr(label)}">${markup.join("")}</span>`;
 }
 
-function escapeAttr(value: string): string {
-  return value
-    .replace(/&/g, "&amp;")
-    .replace(/"/g, "&quot;")
-    .replace(/</g, "&lt;")
-    .replace(/>/g, "&gt;");
-}
-
-/** Toggles the class that starts the draw-in transition for a rendered word's strokes. */
+/**
+ * Starts the draw-in transition for everything glyphed.js drew inside `el` — words, icons,
+ * annotations, charts: adds `hw-visible` and sets each stroke's `stroke-dashoffset` to `0`.
+ */
 export function animateWriting(el: Element): void {
   el.classList.add("hw-visible");
-  for (const path of el.querySelectorAll<SVGPathElement>(".hw-letter")) {
+  for (const path of el.querySelectorAll<SVGPathElement>(`.${STROKE_CLASS}`)) {
     path.style.strokeDashoffset = "0";
   }
 }

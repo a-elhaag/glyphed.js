@@ -1,5 +1,28 @@
 export { renderText, animateWriting, type RenderTextOptions } from "./renderer.js";
 export { attach, type AttachOptions } from "./observer.js";
+export { renderIcon, drawIcon, type RenderIconOptions, type DrawIconOptions } from "./icon.js";
+export { icon, type Icon } from "./icons/types.js";
+export {
+  annotate,
+  renderAnnotation,
+  annotationBleed,
+  type Annotation,
+  type AnnotationType,
+  type AnnotationOptions,
+  type AnnotateOptions,
+} from "./annotate.js";
+export {
+  renderChart,
+  drawChart,
+  renderSparkline,
+  chartPalette,
+  type ChartDatum,
+  type ChartOptions,
+  type DrawChartOptions,
+  type SparklineOptions,
+} from "./chart.js";
+export { sketch, type SketchOptions } from "./engine/sketch.js";
+export * as shapes from "./engine/shapes.js";
 
 import { renderText, type RenderTextOptions } from "./renderer.js";
 import { attach, type AttachOptions } from "./observer.js";

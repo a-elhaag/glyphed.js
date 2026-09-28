@@ -1,7 +1,7 @@
 {
   "name": "glyphed.js",
-  "version": "1.0.0",
-  "description": "Renders text as animated hand-drawn SVG",
+  "version": "1.1.0",
+  "description": "Renders text, icons, annotations and charts as animated hand-drawn SVG",
   "type": "module",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
@@ -9,6 +9,10 @@
     ".": {
       "types": "./dist/index.d.ts",
       "import": "./dist/index.js"
+    },
+    "./icons": {
+      "types": "./dist/icons/index.d.ts",
+      "import": "./dist/icons/index.js"
     }
   },
   "files": [
@@ -31,7 +35,12 @@
     "svg",
     "animation",
     "text",
-    "typography"
+    "typography",
+    "icons",
+    "hand-drawn",
+    "sketch",
+    "charts",
+    "annotation"
   ],
   "author": "Anas <anaselhaag@gmail.com>",
   "license": "ISC",

@@ -593,6 +593,85 @@ pre code {
   color: var(--muted);
 }
 
+.sketch-lead {
+  max-width: 62ch;
+  margin: 16px 0 0;
+  color: var(--muted);
+}
+.icon-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(104px, 1fr));
+  margin-top: 40px;
+  border-top: 1px solid var(--ink);
+  border-left: 1px solid var(--ink);
+  --hw-color: var(--ink);
+}
+.icon-cell {
+  display: grid;
+  justify-items: center;
+  gap: 10px;
+  padding: 20px 8px 12px;
+  border-right: 1px solid var(--ink);
+  border-bottom: 1px solid var(--ink);
+}
+.icon-cell:nth-child(3n) {
+  --hw-color: var(--vermilion);
+}
+.icon-cell:nth-child(5n) {
+  --hw-color: var(--cobalt);
+}
+.icon-cell code {
+  color: var(--muted);
+  font-family: "Martian Mono", monospace;
+  font-size: 0.66rem;
+}
+.sketch-row {
+  display: grid;
+  grid-template-columns: minmax(0, 1.1fr) minmax(0, 1fr) minmax(0, 1fr);
+  gap: 24px;
+  margin-top: 40px;
+}
+.note-card,
+.chart-card {
+  margin: 0;
+  padding: 24px;
+  background: oklch(0.99 0.008 88);
+  border: 1px solid var(--ink);
+  --hw-color: var(--ink);
+}
+.note-text {
+  margin: 0;
+  font-size: 1.1rem;
+  line-height: 2.3;
+}
+.note-text [data-mark="underline"],
+.note-text [data-mark="circle"],
+.note-text [data-mark="strike"],
+.note-text [data-mark="box"] {
+  --hw-color: var(--vermilion);
+}
+.inline-sample {
+  margin-top: 20px;
+}
+.inline-sample .hw-word {
+  max-width: 100%;
+  height: auto;
+}
+.chart-card {
+  display: grid;
+  align-content: space-between;
+  gap: 12px;
+}
+.chart-card svg.hw-chart {
+  width: 100%;
+  height: auto;
+}
+.chart-card figcaption {
+  color: var(--muted);
+  font-family: "Martian Mono", monospace;
+  font-size: 0.72rem;
+}
+
 @media (max-width: 760px) {
   .site-header,
   footer,
@@ -666,6 +745,12 @@ pre code {
   .variation-samples {
     min-height: 96px;
   }
+  .sketch-row {
+    grid-template-columns: 1fr;
+  }
+  .icon-grid {
+    grid-template-columns: repeat(auto-fill, minmax(84px, 1fr));
+  }
   .how-it-works {
     padding: 96px 0;
   }
@@ -694,7 +779,7 @@ pre code {
   .docs-nav {
     position: static;
     grid-auto-flow: column;
-    grid-template-columns: repeat(6, max-content);
+    grid-template-columns: repeat(8, max-content);
     overflow-x: auto;
     padding-bottom: 10px;
     scrollbar-width: thin;

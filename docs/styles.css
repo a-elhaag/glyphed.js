@@ -593,6 +593,121 @@ pre code {
   color: var(--muted);
 }
 
+.icon-reference,
+.chart-reference {
+  margin: 32px 0;
+  border-top: 1px solid var(--ink);
+  border-bottom: 1px solid var(--ink);
+}
+.reference-toolbar {
+  display: grid;
+  grid-template-columns: auto minmax(180px, 1fr) auto;
+  align-items: center;
+  gap: 16px;
+  padding: 14px 0;
+  border-bottom: 1px solid var(--ink);
+}
+.reference-toolbar label {
+  font-weight: 700;
+}
+.reference-toolbar input {
+  width: 100%;
+  min-height: 38px;
+  padding: 8px 10px;
+  color: var(--ink);
+  border: 1px solid var(--ink);
+  border-radius: 2px;
+  background: oklch(0.99 0.008 88);
+}
+.reference-toolbar p,
+.reference-note {
+  margin: 0;
+  color: var(--muted);
+  font-family: "Martian Mono", monospace;
+  font-size: 0.7rem;
+}
+.docs-icon-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(112px, 1fr));
+  border-left: 1px solid var(--ink);
+}
+.docs-icon-button {
+  min-height: 112px;
+  display: grid;
+  place-items: center;
+  align-content: center;
+  gap: 7px;
+  padding: 12px 6px;
+  color: var(--ink);
+  border: 0;
+  border-right: 1px solid var(--ink);
+  border-bottom: 1px solid var(--ink);
+  background: transparent;
+  cursor: pointer;
+}
+.docs-icon-button:nth-child(3n) {
+  --hw-color: var(--vermilion);
+}
+.docs-icon-button:nth-child(5n) {
+  --hw-color: var(--cobalt);
+}
+.docs-icon-button:hover {
+  background: var(--mint);
+}
+.docs-icon-button code {
+  overflow-wrap: anywhere;
+  color: var(--ink);
+  font-size: 0.68rem;
+}
+.docs-icon-button span {
+  color: var(--muted);
+  font-family: "Martian Mono", monospace;
+  font-size: 0.6rem;
+}
+.reference-note {
+  padding: 12px 0;
+}
+.chart-picker {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0;
+  border-bottom: 1px solid var(--ink);
+}
+.chart-picker button {
+  min-height: 42px;
+  padding: 8px 15px;
+  color: var(--ink);
+  border: 0;
+  border-right: 1px solid var(--ink);
+  background: transparent;
+  font-family: "Martian Mono", monospace;
+  font-size: 0.7rem;
+  font-weight: 600;
+  cursor: pointer;
+}
+.chart-picker button[aria-selected="true"] {
+  color: var(--paper);
+  background: var(--ink);
+}
+.chart-picker button:hover:not([aria-selected="true"]) {
+  background: var(--mint);
+}
+.chart-preview {
+  min-height: 280px;
+  display: grid;
+  place-items: center;
+  padding: 22px 12px;
+  background: oklch(0.99 0.008 88);
+}
+.chart-preview svg.hw-chart {
+  width: min(100%, 520px);
+  height: auto;
+}
+.reference-code {
+  margin: 0;
+  border-radius: 0;
+}
+
 .sketch-lead {
   max-width: 62ch;
   margin: 16px 0 0;
@@ -750,6 +865,21 @@ pre code {
   }
   .icon-grid {
     grid-template-columns: repeat(auto-fill, minmax(84px, 1fr));
+  }
+  .reference-toolbar {
+    grid-template-columns: 1fr auto;
+  }
+  .reference-toolbar label {
+    grid-column: 1 / -1;
+  }
+  .docs-icon-grid {
+    grid-template-columns: repeat(auto-fill, minmax(92px, 1fr));
+  }
+  .docs-icon-button {
+    min-height: 102px;
+  }
+  .chart-preview {
+    min-height: 220px;
   }
   .how-it-works {
     padding: 96px 0;

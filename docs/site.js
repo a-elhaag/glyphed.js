@@ -1,8 +1,11 @@
 import {
   attach,
+  drawChart,
+  renderIcon,
   renderText,
   write,
 } from "https://cdn.jsdelivr.net/npm/glyphed.js@^2.0.1/+esm";
+import { icons as iconLibrary } from "https://cdn.jsdelivr.net/npm/glyphed.js@^2.0.1/icons/+esm";
 
 const reduceMotion = window.matchMedia(
   "(prefers-reduced-motion: reduce)",
@@ -157,3 +160,114 @@ for (const command of document.querySelectorAll(".copy-command")) {
 for (const block of document.querySelectorAll("pre[data-copy]")) {
   addCopyButton(block, block.textContent.trim());
 }
+
+const docsIconGrid = document.querySelector("#docs-icon-grid");
+const iconSearch = document.querySelector("#icon-search");
+const iconCount = document.querySelector("#icon-count");
+
+function iconExportName(name) {
+  return name.replace(/-([a-z0-9])/g, (_, letter) => letter.toUpperCase());
+}
+
+async function copyIconExample(icon) {
+  const exportName = iconExportName(icon.name);
+  const code = `import { drawIcon } from "glyphed.js";
+import { ${exportName} } from "glyphed.js/icons";
+
+drawIcon("#icon", ${exportName}, {
+  size: 48,
+  label: "${icon.name}",
+});`;
+  await copyText(code);
+}
+
+function renderIconCatalog(query = "") {
+  if (!docsIconGrid) return;
+  const normalizedQuery = query.trim().toLowerCase();
+  const visibleIcons = Object.values(iconLibrary)
+    .sort((first, second) => first.name.localeCompare(second.name))
+    .filter((icon) => icon.name.includes(normalizedQuery));
+
+  docsIconGrid.replaceChildren();
+  for (const icon of visibleIcons) {
+    const button = document.createElement("button");
+    button.className = "docs-icon-button";
+    button.type = "button";
+    button.setAttribute("aria-label", `Copy code for ${icon.name} icon`);
+    button.innerHTML = `${renderIcon(icon, { size: 32, label: icon.name, animate: false })}<code>${icon.name}</code><span>Copy code</span>`;
+    button.addEventListener("click", async () => {
+      await copyIconExample(icon);
+      const feedback = button.querySelector("span");
+      feedback.textContent = "Copied";
+      window.setTimeout(() => {
+        feedback.textContent = "Copy code";
+      }, 1600);
+    });
+    docsIconGrid.append(button);
+  }
+
+  if (iconCount) {
+    iconCount.textContent = `${visibleIcons.length} icon${visibleIcons.length === 1 ? "" : "s"}`;
+  }
+}
+
+iconSearch?.addEventListener("input", () => renderIconCatalog(iconSearch.value));
+renderIconCatalog();
+
+const chartPreview = document.querySelector("#chart-preview");
+const chartCode = document.querySelector("#chart-code");
+const copyChartCode = document.querySelector("#copy-chart-code");
+const chartButtons = document.querySelectorAll("[data-chart-type]");
+
+const chartData = [
+  { label: "Mon", value: 12 },
+  { label: "Tue", value: 19 },
+  { label: "Wed", value: 15 },
+  { label: "Thu", value: 24 },
+];
+
+function chartExample(type) {
+  return `import { drawChart } from "glyphed.js";
+
+drawChart("#chart", {
+  type: "${type}",
+  data: [
+    { label: "Mon", value: 12 },
+    { label: "Tue", value: 19 },
+    { label: "Wed", value: 15 },
+    { label: "Thu", value: 24 },
+  ],
+  title: "Weekly activity",
+});`;
+}
+
+function renderChartExample(type) {
+  if (!chartPreview || !chartCode) return;
+  drawChart(chartPreview, {
+    type,
+    data: chartData,
+    width: 520,
+    height: 270,
+    title: "Weekly activity",
+    animate: !reduceMotion,
+  });
+  chartCode.textContent = chartExample(type);
+  for (const button of chartButtons) {
+    const selected = button.dataset.chartType === type;
+    button.setAttribute("aria-selected", String(selected));
+  }
+}
+
+for (const button of chartButtons) {
+  button.addEventListener("click", () => renderChartExample(button.dataset.chartType));
+}
+
+copyChartCode?.addEventListener("click", async () => {
+  await copyText(chartCode?.textContent ?? "");
+  copyChartCode.textContent = "Copied";
+  window.setTimeout(() => {
+    copyChartCode.textContent = "Copy";
+  }, 1600);
+});
+
+renderChartExample("bar");

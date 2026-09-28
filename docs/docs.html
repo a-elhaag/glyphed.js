@@ -31,7 +31,8 @@
         <a href="#quick-start">Quick start</a>
         <a href="#api">API</a>
         <a href="#icons">Icons</a>
-        <a href="#marks">Marks &amp; charts</a>
+        <a href="#charts">Charts</a>
+        <a href="#marks">Annotations</a>
         <a href="#react">React</a>
         <a href="#ssr">SSR</a>
         <a href="#glyphs">Glyphs</a>
@@ -112,17 +113,30 @@ write("#hello", "Hello, world!");</code></pre>
         <section id="icons">
           <h2 class="handwritten-heading">Icons</h2>
           <p>
-            68 icons drawn on the letters' 24-unit grid with the same pen. The
-            engine wobbles them on every render, so no two look stamped.
-            Import only the ones you use.
+            Every bundled icon is on the same 24-unit grid as the lettering.
+            Search by name, then select an icon to copy a ready-to-use import
+            and render call. Import individual icons to keep your bundle small.
           </p>
-          <pre data-copy><code>import { drawIcon, renderText } from "glyphed.js";
-import { rocket, heart, icons } from "glyphed.js/icons";
+          <div class="icon-reference" aria-label="Icon reference">
+            <div class="reference-toolbar">
+              <label for="icon-search">Find an icon</label>
+              <input id="icon-search" type="search" placeholder="Search rocket, arrow, chart..." autocomplete="off" />
+              <p id="icon-count" aria-live="polite"></p>
+            </div>
+            <div class="docs-icon-grid" id="docs-icon-grid"></div>
+            <p class="reference-note">Select an icon to copy its code.</p>
+          </div>
+          <p>
+            For icons inside a sentence, pass imported icons by name. Matching
+            <code>:name:</code> shortcodes draw inline; unknown shortcodes stay
+            as text.
+          </p>
+          <pre data-copy><code>import { renderText } from "glyphed.js";
+import { rocket, heart } from "glyphed.js/icons";
 
-drawIcon("#logo", rocket, { size: 48, label: "Launch" });
-
-// Inline, inside handwritten text:
-renderText("Ship it :rocket: with :heart:", { icons: { rocket, heart } });</code></pre>
+const markup = renderText("Ship it :rocket: with :heart:", {
+  icons: { rocket, heart },
+});</code></pre>
           <dl class="api-list">
             <div>
               <dt><code>renderIcon(icon, options?)</code></dt>
@@ -147,22 +161,23 @@ renderText("Ship it :rocket: with :heart:", { icons: { rocket, heart } });</code
           </dl>
         </section>
 
-        <section id="marks">
-          <h2 class="handwritten-heading">Marks &amp; charts</h2>
+        <section id="charts">
+          <h2 class="handwritten-heading">Charts</h2>
           <p>
-            Annotations and charts use the same engine and scroll trigger.
+            Pick a chart type to see it draw and copy a complete example. Charts
+            use direct labels, accessible SVG output, and hatching as a second
+            cue alongside color.
           </p>
-          <pre data-copy><code>import { annotate, drawChart, renderSparkline } from "glyphed.js";
-
-annotate("#price", { type: "circle", color: "#c63d24" });
-
-drawChart("#stats", {
-  type: "bar",
-  data: [
-    { label: "Mon", value: 12 },
-    { label: "Tue", value: 19 },
-  ],
-});</code></pre>
+          <div class="chart-reference">
+            <div class="chart-picker" role="tablist" aria-label="Chart type">
+              <button type="button" role="tab" aria-selected="true" data-chart-type="bar">Bar</button>
+              <button type="button" role="tab" aria-selected="false" data-chart-type="line">Line</button>
+              <button type="button" role="tab" aria-selected="false" data-chart-type="pie">Pie</button>
+              <button type="button" role="tab" aria-selected="false" data-chart-type="donut">Donut</button>
+            </div>
+            <div class="chart-preview" id="chart-preview" aria-live="polite"></div>
+            <pre class="reference-code"><code id="chart-code"></code><button class="copy-button" id="copy-chart-code" type="button">Copy</button></pre>
+          </div>
           <dl class="api-list">
             <div>
               <dt><code>annotate(target, options)</code></dt>
@@ -180,8 +195,46 @@ drawChart("#stats", {
               </dd>
             </div>
             <div>
+              <dt><code>ChartOptions</code></dt>
+              <dd>
+                Set <code>width</code>, <code>height</code>, <code>color</code>,
+                <code>colors</code>, <code>fill</code>, <code>format</code>,
+                <code>title</code>, <code>roughness</code>, <code>seed</code>,
+                <code>dots</code>, and <code>animate</code> as needed.
+              </dd>
+            </div>
+            <div>
               <dt><code>renderSparkline(values, options?)</code></dt>
               <dd>A trend line one text-line tall, for inline use.</dd>
+            </div>
+          </dl>
+        </section>
+
+        <section id="marks">
+          <h2 class="handwritten-heading">Annotations</h2>
+          <p>
+            Add a hand-drawn mark to an element after it is in the document.
+            The returned controller lets you redraw after content changes or
+            remove the mark during cleanup.
+          </p>
+          <pre data-copy><code>import { annotate } from "glyphed.js";
+
+const mark = annotate("#price", {
+  type: "circle",
+  color: "#c63d24",
+  passes: 2,
+});
+
+mark.redraw();
+mark.remove();</code></pre>
+          <dl class="api-list">
+            <div>
+              <dt><code>annotate(target, options)</code></dt>
+              <dd>
+                Types: <code>underline</code>, <code>circle</code>, <code>box</code>,
+                <code>highlight</code>, <code>strike</code>, <code>cross</code>,
+                <code>bracket</code>. Returns <code>{ redraw, remove }</code>.
+              </dd>
             </div>
           </dl>
         </section>
